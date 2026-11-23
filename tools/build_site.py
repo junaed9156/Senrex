@@ -166,7 +166,8 @@ def foot():
   <div class="copy"><span>© 2026 {t(CO['en'], CO['zh'])}</span><span>{t('Reliable quality · Timely delivery · Superior service','可靠的质量 · 及时的供货 · 最佳的服务')}</span></div>
 </div></footer>
 <div class="float">
-  <a class="wa" href="{wa('Hello Senrex, I am interested in your products.')}" target="_blank" rel="noopener" aria-label="WhatsApp">{WA_SVG}</a>
+  <a class="wa wa-name" href="https://wa.me/{CO['ceo_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo_name'].split()[0] + ', I am interested in Senrex energy storage products.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo_name'])}">{WA_SVG}<span>{e(CO['ceo_name'])}</span></a>
+  <a class="wa wa-name" href="https://wa.me/{CO['ceo2_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo2_name'].split()[0] + ', I am interested in Senrex remote controls.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo2_name'])}">{WA_SVG}<span>{e(CO['ceo2_name'])}</span></a>
   <a class="em" href="contact.html#form">{MAIL_SVG}{t('Email sales','邮件询价')}</a>
 </div>
 <div class="modal" id="pmodal"><div class="box"><button class="x" data-close aria-label="Close">×</button><div class="gal"></div><div class="info"></div></div></div>
@@ -252,20 +253,7 @@ def page_home():
   </div>
   {CERTGRID_HTML}
 </div></section>
-''' + ceo_section() + f'''<section class="s alt" id="inquiry"><div class="wrap contact">
-  <div class="cbox">
-    <div class="kicker">{t('Contact us','联系我们')}</div>
-    <h3 style="font-size:24px;margin-top:6px">{t('Get a quotation in 24 hours','24小时内获取报价')}</h3>
-    <p style="color:var(--muted)">{t('For pricing, specifications or delivery dates, write to our sales team or contact us directly.','请填写右侧询盘表单，询盘将直接发送至我们的销售邮箱。您也可以直接联系我们：')}</p>
-    <div class="cline"><b>WhatsApp</b><a href="{WA_LINK}" target="_blank" rel="noopener">{CO['mobile']}</a></div>
-    <div class="cline"><b>{t('WeChat','微信')}</b><span>{CO['mobile']}</span></div>
-    <div class="cline"><b>{t('Tel','座机')}</b><a href="tel:{CO['tel_link']}">{CO['tel']}</a></div>
-    <div class="cline"><b>{t('Email','邮箱')}</b><a href="mailto:{CO['email']}">{CO['email']}</a></div>
-    <div class="qr">
-      <figure><img src="{img('assets/img/qr_wechat.png')}" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
-      <figure><img src="{img('assets/img/qr_whatsapp.png')}" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
-    </div>
-  </div>
+''' + ceo_section() + f'''<section class="s alt" id="inquiry"><div class="wrap contact single">
   <div class="cbox">
     {inquiry_form('inq-home')}
   </div>

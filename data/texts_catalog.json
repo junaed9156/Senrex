@@ -230,36 +230,6 @@
 "zh": "直接联系我们的负责人"
 },
 {
-"key": "Contact us",
-"en": "Contact us",
-"zh": "联系我们"
-},
-{
-"key": "Get a quotation in 24 hours",
-"en": "Get a quotation in 24 hours",
-"zh": "24小时内获取报价"
-},
-{
-"key": "For pricing, specifications or delivery dates, write to our sales team or contact us directly.",
-"en": "For pricing, specifications or delivery dates, write to our sales team or contact us directly.",
-"zh": "请填写右侧询盘表单，询盘将直接发送至我们的销售邮箱。您也可以直接联系我们："
-},
-{
-"key": "WeChat",
-"en": "WeChat",
-"zh": "微信"
-},
-{
-"key": "Tel",
-"en": "Tel",
-"zh": "座机"
-},
-{
-"key": "Email",
-"en": "Email",
-"zh": "邮箱"
-},
-{
 "key": "Your name *",
 "en": "Your name *",
 "zh": "您的姓名 *"
@@ -670,9 +640,24 @@
 "zh": "手机 / 微信"
 },
 {
+"key": "Tel",
+"en": "Tel",
+"zh": "座机"
+},
+{
+"key": "Email",
+"en": "Email",
+"zh": "邮箱"
+},
+{
 "key": "Address",
 "en": "Address",
 "zh": "地址"
+},
+{
+"key": "WeChat",
+"en": "WeChat",
+"zh": "微信"
 },
 {
 "key": "Chat on WhatsApp",
