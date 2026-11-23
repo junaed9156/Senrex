@@ -164,7 +164,7 @@ def foot():
     </div>
   </div>
   <div class="copy"><span>© 2026 {t(CO['en'], CO['zh'])}</span><span>{t('Reliable quality · Timely delivery · Superior service','可靠的质量 · 及时的供货 · 最佳的服务')}</span></div>
-  <div class="jr-credit" style="text-align:center;font-size:10px;line-height:1.5;opacity:.6;margin-top:10px">Powered by JR Enterprise · Mobile/WhatsApp: <a href="https://wa.me/8801876284203" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">+8801876284203</a> · <a href="mailto:junaedm333@gmail.com" style="color:inherit;text-decoration:none">junaedm333@gmail.com</a></div>
+  <div class="jr-credit" style="text-align:center;font-size:10px;line-height:1.5;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap"><img src="assets/img/jr-enterprise-logo.webp" width="45" height="24" alt="JR Enterprise" loading="lazy" style="height:24px;width:auto;display:block"><span style="opacity:.65">Powered by JR Enterprise · Mobile/WhatsApp: <a href="https://wa.me/8801876284203" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">+8801876284203</a> · <a href="mailto:junaedm333@gmail.com" style="color:inherit;text-decoration:none">junaedm333@gmail.com</a></span></div>
 </div></footer>
 <div class="float">
   <a class="wa wa-name" href="https://wa.me/{CO['ceo_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo_name'].split()[0] + ', I am interested in Senrex energy storage products.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo_name'])}">{WA_SVG}<span>{e(CO['ceo_name'])}</span></a>
