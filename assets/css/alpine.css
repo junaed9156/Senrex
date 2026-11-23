@@ -294,3 +294,5 @@ footer .logo img { mix-blend-mode:multiply; }
   #imodal .inquiry-intro { padding-inline-end:26px; }
   #imodal .inquiry-intro h2 { font-size:1.5rem; }
 }
+/* transparent cut-out product photos: no white box, soft shadow */
+.card .pic img[src$=".webp"],.modal .gal img[src$=".webp"]{mix-blend-mode:normal !important;object-fit:contain;padding:10px;filter:drop-shadow(0 16px 14px rgba(8,28,36,.38)) drop-shadow(0 3px 3px rgba(0,0,0,.12)) !important}

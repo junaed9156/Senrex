@@ -5,6 +5,8 @@
   function isZh() { return html.lang === 'zh-CN'; }
   function L(en, zh) { return '<span class="en">' + en + '</span><span class="zh">' + zh + '</span>'; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pimg(kind, f) { return f.indexOf('/') >= 0 ? f : 'assets/img/' + kind + '/' + f; }
+  function nm(p, en, zh) { return p.name_en ? L(esc(p.name_en), esc(p.name_zh || p.name_en)) : L(en, zh); }
   function waLink(text) { return 'https://wa.me/' + CFG.wa + '?text=' + encodeURIComponent(text); }
 
   /* language */
@@ -15,6 +17,18 @@
   }
   document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.l); }); });
   setLang(html.lang === 'zh-CN' ? 'zh-CN' : 'en');
+
+  /* hidden admin door: tap the logo 3 times quickly */
+  var brand = document.querySelector('.brand'), taps = 0, tapTimer;
+  if (brand) brand.addEventListener('click', function (ev) {
+    ev.preventDefault();
+    taps++; clearTimeout(tapTimer);
+    if (taps >= 3) { taps = 0; location.href = 'admin.html'; return; }
+    tapTimer = setTimeout(function () {
+      var n = taps; taps = 0;
+      if (n && document.body.dataset.page !== 'home') location.href = brand.getAttribute('href');
+    }, 650);
+  });
 
   /* menu */
   var page = document.body.dataset.page;
@@ -65,9 +79,9 @@
     var p, imgs, title, rows, name;
     if (kind === 'power') {
       p = DATA.power.filter(function (x) { return x.id === id; })[0];
-      imgs = p.imgs.map(function (f) { return 'assets/img/power/' + f; });
-      name = 'Portable Power Station ' + p.id;
-      title = L('Portable Power Station', '便携式储能电源');
+      imgs = p.imgs.map(function (f) { return pimg('power', f); });
+      name = (p.name_en || 'Portable Power Station') + ' ' + p.id;
+      title = nm(p, 'Portable Power Station', '便携式储能电源');
       rows = row('Output power', '输出功率', p.power) + row('Capacity', '容量', p.capacity) + row('Battery type', '电池类型', p.battery) +
         row('Input voltage', '输入电压', p.input) + row('Waveform', '输出波形', p.wave) + row('AC outlets', 'AC 插座', p.ac) +
         row('USB', 'USB', p.usb) + row('Type-C', 'Type-C', p.typec) + row('Car port', '点烟器', p.car) + row('Solar input', '太阳能输入', p.solar) +
@@ -75,18 +89,18 @@
     } else if (kind === 'solar') {
       p = DATA.solar[+id];
       var sn = DATA.series[p.series];
-      imgs = ['assets/img/solar/' + p.series + '.jpg'];
-      name = sn[0] + ' ' + p.model;
-      title = esc(p.model) + ' <small style="display:block;font-size:15px;color:var(--muted);font-weight:600">' + L(sn[0], sn[1]) + '</small>';
+      imgs = [p._img || ('assets/img/solar/' + p.series + '.jpg')];
+      name = (p.name_en || sn[0] + ' ' + p.model);
+      title = (p.name_en ? nm(p, '', '') : esc(p.model)) + ' <small style="display:block;font-size:15px;color:var(--muted);font-weight:600">' + L(sn[0], sn[1]) + '</small>';
       p = Object.assign({}, p, { id: p.series.toUpperCase() + ' ' + p.model });
       rows = (p.rated !== '—' ? row('Rated power (W)', '额定功率 (W)', p.rated) + row('Peak power (W)', '峰值功率 (W)', p.peak) : '') +
         row('Battery voltage', '电池电压', p.bv) + (p.cap !== '—' ? row('Battery capacity', '电池容量', p.cap) : '') +
         row('Key specs', '主要参数', p.specs) + row('Size (mm)', '尺寸 (mm)', p.size) + row('Weight (kg)', '重量 (kg)', p.weight);
     } else {
       p = DATA.battery.filter(function (x) { return x.id === id; })[0];
-      imgs = ['assets/img/battery/' + p.img];
-      name = p.v + 'V ' + p.ah + 'Ah lithium battery';
-      title = p.v + 'V ' + p.ah + 'Ah ' + L('Lithium Battery Pack', '锂电池组');
+      imgs = [pimg('battery', p.img)];
+      name = p.name_en || (p.v + 'V ' + p.ah + 'Ah lithium battery');
+      title = p.name_en ? nm(p, '', '') : (p.v + 'V ' + p.ah + 'Ah ' + L('Lithium Battery Pack', '锂电池组'));
       var hasL = p.lfp[0] !== '—';
       rows = '<tr><th></th><th>' + L('NMC (ternary)', '三元锂') + '</th>' + (hasL ? '<th>' + L('LiFePO4', '磷酸铁锂') + '</th>' : '') + '</tr>' +
         '<tr><th>' + L('Rated voltage', '额定电压') + '</th><td>' + p.v + ' V</td>' + (hasL ? '<td>' + p.v + ' V</td>' : '') + '</tr>' +
@@ -164,7 +178,7 @@
           : (isZh() ? '请输入有效的电子邮箱。' : 'Please enter a valid email address.');
         return;
       }
-      var labels = {name: 'Name', email: 'Email', company: 'Company', phone: 'Phone / WhatsApp',
+      var labels = {name: 'Name', email: 'Email', company: 'Company', phone: 'Mobile / WhatsApp',
         country: 'Country', quantity: 'Order quantity', product_line: 'Product line', product: 'Model'};
       var lines = Object.keys(labels).filter(function (key) { return form.elements[key].value.trim(); })
         .map(function (key) { return labels[key] + ': ' + form.elements[key].value.trim(); });

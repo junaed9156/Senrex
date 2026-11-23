@@ -9,8 +9,19 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = json.load(open(os.path.join(ROOT, 'data', 'products.json'), encoding='utf-8'))
+_site_path = os.path.join(ROOT, 'data', 'site.json')
+SITE = json.load(open(_site_path, encoding='utf-8')) if os.path.exists(_site_path) else {}
+TEXTS = SITE.get('texts', {})      # {english default: {"en": ..., "zh": ...}} edited in admin
+IMAGES = SITE.get('images', {})    # {default path: new path} edited in admin
+CATALOG = {}                       # every bilingual text used, written for the admin page
 
-CO = {
+def img(path):
+    return IMAGES.get(path) or path
+
+def pimg(kind, f):
+    return f if '/' in f else f'assets/img/{kind}/{f}'
+
+CO_DEFAULT = {
     'en': 'Tianchang Xianrui New Energy Technology Co., Ltd.',
     'zh': '天长市先锐新能源科技有限公司',
     'contact_en': 'Mr. Liu Xianguo', 'contact_zh': '刘先国',
@@ -20,13 +31,18 @@ CO = {
     'addr_zh': '安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋',
     'addr_en': 'Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China',
 }
+CO = dict(CO_DEFAULT, **{k: v for k, v in SITE.get('company', {}).items() if v})
 WA_LINK = 'https://wa.me/' + CO['wa']
-CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="assets/img/certs/cert{i}.jpg" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
+CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="{img(f"assets/img/certs/cert{i}.jpg")}" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
 
 def e(s):
     return html.escape(str(s))
 
 def t(en, zh, tag='span'):
+    key = en
+    CATALOG.setdefault(key, {'en': en, 'zh': zh})
+    o = TEXTS.get(key) or {}
+    en, zh = o.get('en') or en, o.get('zh') or zh
     return f'<{tag} class="en">{en}</{tag}><{tag} class="zh">{zh}</{tag}>'
 
 def wa(text):
@@ -68,7 +84,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
   <a href="mailto:{CO['email']}">✉ {CO['email']}</a>
 </div></div>
 <header class="nav"><div class="wrap">
-  <a class="brand" href="index.html"><span class="brand-depth" aria-hidden="true"><img src="assets/img/logo_mark.png" width="158" height="160" alt="">{LOGO_EDGES}</span><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
+  <a class="brand" href="index.html"><span class="brand-depth" aria-hidden="true"><img src="{img('assets/img/logo_mark.png')}" width="158" height="160" alt="">{LOGO_EDGES}</span><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
   <nav class="menu" id="menu">
     <a href="index.html" data-p="home">{t('Home','首页')}</a>
     <a href="products.html" data-p="products">{t('Products','产品中心')}</a>
@@ -94,7 +110,7 @@ def inquiry_form(prefill_id='inq'):
     email = field('email', 'Email address *', '电子邮箱 *', 'type="email" autocomplete="email" required')
     message = field('message', 'What do you need? *', '您的需求 *', 'rows="4" required', tag='textarea')
     company = field('company', 'Company', '公司名称', 'autocomplete="organization"')
-    phone = field('phone', 'Phone / WhatsApp', '电话 / WhatsApp', 'type="tel" autocomplete="tel"')
+    phone = field('phone', 'Mobile number / WhatsApp', '手机号码 / WhatsApp', 'type="tel" autocomplete="tel" placeholder="+86 138 0000 0000"')
     country = field('country', 'Country', '国家', 'class="country-select"', tag='select', options=empty)
     quantity = field('quantity', 'Order quantity', '采购数量')
     line = field('product_line', 'Product line', '产品线', tag='select', options=empty + line_options)
@@ -104,9 +120,10 @@ def inquiry_form(prefill_id='inq'):
     <div><h2 id="{prefill_id}-title">{t('Request a quotation', '获取报价')}</h2><p>{t('Tell our sales team what you’re sourcing and when you need it.', '告诉销售团队您想采购的产品及交付时间。')}</p></div>
   </div>
   <div class="row">{name}{email}</div>
+  <div class="row">{country}{phone}</div>
   {message}
-  <details class="order-details"><summary>{t('Product & contact details','产品与联系信息')}</summary>
-    <div class="order-fields"><div class="row">{line}{model}</div><div class="row">{quantity}{company}</div><div class="row">{country}{phone}</div></div>
+  <details class="order-details"><summary>{t('Product & order details','产品与订单信息')}</summary>
+    <div class="order-fields"><div class="row">{line}{model}</div><div class="row">{quantity}{company}</div></div>
   </details>
   <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
   <div class="inquiry-send"><button class="btn btn-green" type="submit">{MAIL_SVG}{t('Open email draft','打开邮件草稿')}</button>
@@ -119,7 +136,7 @@ def foot():
 <footer><div class="wrap">
   <div class="cols">
     <div>
-      <div class="logo"><img src="assets/img/logo.png" alt="Senrex 赛恩力"></div>
+      <div class="logo"><img src="{img('assets/img/logo.png')}" alt="Senrex 赛恩力"></div>
       <p>{t(CO['en'], CO['zh'])}</p>
       <p>{t('Lithium battery source factory · Wholesale from stock · Dropshipping · Export','锂电池源头工厂 · 现货批发 · 一件代发 · 外贸出口')}</p>
     </div>
@@ -152,12 +169,12 @@ def foot():
 
 # ---------------- HOME ----------------
 def page_home():
-    cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{img}" alt="{e(en)}" loading="lazy"></div>
-<div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, img in CATS)
+    cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{img(im)}" alt="{e(en)}" loading="lazy"></div>
+<div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, im in CATS)
     return head('Lithium Battery Factory', 'home') + f'''
 <section class="hero alpine">
   <picture class="alpine-scene">
-    <img src="assets/img/showcase/alpine-1536.webp" srcset="assets/img/showcase/alpine-900.webp 900w, assets/img/showcase/alpine-1536.webp 1536w" sizes="100vw" width="1536" height="1024" fetchpriority="high" alt="">
+    <img src="{img('assets/img/showcase/alpine-1536.webp')}" {'' if IMAGES.get('assets/img/showcase/alpine-1536.webp') else 'srcset="assets/img/showcase/alpine-900.webp 900w, assets/img/showcase/alpine-1536.webp 1536w"'} sizes="100vw" width="1536" height="1024" fetchpriority="high" alt="">
   </picture>
   <div class="wrap"><div class="hero-copy">
   <span class="tag">{t('Lithium battery source factory','锂电池源头工厂')}</span>
@@ -206,8 +223,8 @@ def page_home():
     <div class="cline"><b>{t('Tel','座机')}</b><a href="tel:{CO['tel_link']}">{CO['tel']}</a></div>
     <div class="cline"><b>{t('Email','邮箱')}</b><a href="mailto:{CO['email']}">{CO['email']}</a></div>
     <div class="qr">
-      <figure><img src="assets/img/qr_wechat.png" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
-      <figure><img src="assets/img/qr_whatsapp.png" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
+      <figure><img src="{img('assets/img/qr_wechat.png')}" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
+      <figure><img src="{img('assets/img/qr_whatsapp.png')}" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
     </div>
   </div>
   <div class="cbox">
@@ -232,16 +249,23 @@ def page_products():
     # power
     pcards = ''
     for p in D['power']:
-        _w, _h = Image.open(os.path.join(ROOT, 'assets/img/power', p['imgs'][0])).size
+        src = pimg('power', p['imgs'][0])
+        try:
+            _w, _h = Image.open(os.path.join(ROOT, src)).size
+        except Exception:
+            _w, _h = 1, 1
         fit = ' fit' if _w / _h > 0.8 else ''
-        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic{fit}"><img src="assets/img/power/{p['imgs'][0]}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
-<div class="body"><span class="code">{p['id']}</span><h3>{t('Portable Power Station','便携式储能电源')}</h3><div class="meta">{e(p['power'])}</div>
+        name = t(p['name_en'], p.get('name_zh') or p['name_en']) if p.get('name_en') else t('Portable Power Station','便携式储能电源')
+        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic{fit}"><img src="{src}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
+<div class="body"><span class="code">{p['id']}</span><h3>{name}</h3><div class="meta">{e(p['power'])}</div>
 <div class="chips"><span class="chip">{e(p['capacity'][:40])}</span><span class="chip">{e(p['battery'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     bcards = ''
     for b in D['battery']:
         chem = 'NMC' + (' · LiFePO4' if b['lfp'][0] != '—' else '')
-        bcards += f'''<div class="card" data-kind="battery" data-id="{b['id']}"><div class="pic"><img src="assets/img/battery/{b['img']}" alt="{b['v']}V {b['ah']}Ah lithium battery pack" loading="lazy"></div>
-<div class="body"><span class="code">{b['id']}</span><h3>{b['v']}V {b['ah']}Ah {t('Lithium Battery','锂电池组')}</h3><div class="meta">{b['wh']:,} Wh</div>
+        b['wh'] = int(float(b['v']) * float(b['ah']))
+        name = t(b['name_en'], b.get('name_zh') or b['name_en']) if b.get('name_en') else f"{b['v']}V {b['ah']}Ah {t('Lithium Battery','锂电池组')}"
+        bcards += f'''<div class="card" data-kind="battery" data-id="{b['id']}"><div class="pic"><img src="{pimg('battery', b['img'])}" alt="{b['v']}V {b['ah']}Ah lithium battery pack" loading="lazy"></div>
+<div class="body"><span class="code">{b['id']}</span><h3>{name}</h3><div class="meta">{b['wh']:,} Wh</div>
 <div class="chips"><span class="chip">{chem}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     sol = ''
     for key, (en, zh, den, dzh) in SERIES.items():
@@ -249,16 +273,18 @@ def page_products():
         for i, x in enumerate(D['solar']):
             if x['series'] != key: continue
             sub = (e(x['cap']) if key == 'gbp' else f"{e(x['rated'])} W")
-            cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="assets/img/solar/{key}.jpg" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
-<div class="body"><span class="code">{key.upper()}</span><h3>{e(x['model'])}</h3><div class="meta">{t(en, zh)}</div>
+            simg = pimg('solar', x['img']) if x.get('img') else img(f'assets/img/solar/{key}.jpg')
+            x['_img'] = simg
+            cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="{simg}" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
+<div class="body"><span class="code">{key.upper()}</span><h3>{t(x['name_en'], x.get('name_zh') or x['name_en']) if x.get('name_en') else e(x['model'])}</h3><div class="meta">{t(en, zh)}</div>
 <div class="chips"><span class="chip">{sub}</span><span class="chip">{e(x['bv'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
         sol += f'''<div class="series-head" id="{key}"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p></div><div class="grid">{cards}</div>'''
     rem = ''
     for r in D['remote']:
         ty = t('AC remote', '空调遥控器') if r['type'] == 'AC' else t('TV remote', '电视遥控器')
         models = ''.join(f'<a href="{wa("Hello Senrex, I am interested in remote control " + m + " (" + r["brand"] + ")")}" target="_blank" rel="noopener">{e(m)}</a>' for m in r['models'])
-        rem += f'''<div class="rem"><img src="assets/img/remote/{r['img']}" alt="{e(r['brand'])} {r['type']} remote controls" loading="lazy" data-zoom>
-<div class="body"><h3>{e(r['brand'])}<span class="ty">{ty}</span></h3><div class="models">{models}</div></div></div>'''
+        rem += f'''<div class="rem"><img src="{pimg('remote', r['img'])}" alt="{e(r['brand'])} {r['type']} remote controls" loading="lazy" data-zoom>
+<div class="body"><h3>{t(r['brand'], r.get('brand_zh') or r['brand'])}<span class="ty">{ty}</span></h3><div class="models">{models}</div></div></div>'''
     return head('Products', 'products') + f'''
 <div class="ptitle"><div class="wrap"><h1>{t('Products','产品中心')}</h1><p>{TOTAL} {t('models across 4 product lines. Click any product for full specifications.','个型号，4大产品线。点击产品查看完整参数。')}</p></div></div>
 <div class="tabs"><div class="wrap">{tabs}</div></div>
@@ -278,18 +304,11 @@ def page_about():
   <div>
     <div class="kicker">{t('Company profile','公司简介')}</div>
     <h2 style="color:var(--navy);font-size:28px;margin:6px 0 14px">{t('Technology · Manufacturing · Quality','科技缔造 · 专业品质')}</h2>
-    <div class="en">
-      <p>Tianchang Xianrui New Energy Technology Co., Ltd. (brand: Senrex) is a technology-based enterprise deeply involved in the lithium battery industry chain. The company is located in the New Energy Industry Base of Tianchang City, Anhui Province.</p>
-      <p>Lithium batteries are our core business. We produce and sell photovoltaic modules, inverters and related products, and we also design and build solar power and electrical engineering projects. With a complete R&amp;D and testing system, we master the core technologies behind high energy density and long cycle life, and our products meet strict performance requirements.</p>
-      <p>As an important participant in Tianchang's 10-billion-yuan new energy vehicle parts industrial base, Xianrui New Energy is part of the local new energy industrial cluster. We stay technology-driven and quality-first, and aim to become an influential company in the regional new energy field.</p>
-    </div>
-    <div class="zh">
-      <p>天长市先锐新能源科技有限公司（品牌：赛恩力 Senrex）是一家深耕锂电池产业链的科技型企业，公司坐落于安徽省天长市新能源产业基地。</p>
-      <p>公司以锂电池产业为核心方向，主营光伏组件、逆变器等产品生产销售，同时承接光伏发电及电力工程设计施工业务。依托完善的研发测试体系，公司掌握了支撑高能量密度、长循环寿命电池需求的核心技术，产品性能满足严苛要求。</p>
-      <p>作为天长市百亿新能源汽车零部件产业基地的重要参与者，先锐新能源积极融入本地新能源产业集群，借助完善的协作配套与产业政策优势，持续提升自主创新能力。未来，公司将继续坚持科技驱动、质量为本，致力于成为区域新能源领域具有较强影响力的企业。</p>
-    </div>
+    {t('Tianchang Xianrui New Energy Technology Co., Ltd. (brand: Senrex) is a technology-based enterprise deeply involved in the lithium battery industry chain. The company is located in the New Energy Industry Base of Tianchang City, Anhui Province.', '天长市先锐新能源科技有限公司（品牌：赛恩力 Senrex）是一家深耕锂电池产业链的科技型企业，公司坐落于安徽省天长市新能源产业基地。', 'p')}
+    {t('Lithium batteries are our core business. We produce and sell photovoltaic modules, inverters and related products, and we also design and build solar power and electrical engineering projects. With a complete R&D and testing system, we master the core technologies behind high energy density and long cycle life, and our products meet strict performance requirements.', '公司以锂电池产业为核心方向，主营光伏组件、逆变器等产品生产销售，同时承接光伏发电及电力工程设计施工业务。依托完善的研发测试体系，公司掌握了支撑高能量密度、长循环寿命电池需求的核心技术，产品性能满足严苛要求。', 'p')}
+    {t("As an important participant in Tianchang's 10-billion-yuan new energy vehicle parts industrial base, Xianrui New Energy is part of the local new energy industrial cluster. We stay technology-driven and quality-first, and aim to become an influential company in the regional new energy field.", '作为天长市百亿新能源汽车零部件产业基地的重要参与者，先锐新能源积极融入本地新能源产业集群，借助完善的协作配套与产业政策优势，持续提升自主创新能力。未来，公司将继续坚持科技驱动、质量为本，致力于成为区域新能源领域具有较强影响力的企业。', 'p')}
   </div>
-  <img src="assets/img/solar/hero_gsl.jpg" alt="Senrex solar storage systems" style="border-radius:14px">
+  <img src="{img('assets/img/solar/hero_gsl.jpg')}" alt="Senrex solar storage systems" style="border-radius:14px">
 </div></section>
 <section class="s alt"><div class="wrap">
   <div class="head"><div class="kicker">{t('Quality','品质保障')}</div><h2>{t('Inspection reports','检验检测报告')}</h2><p>{t('Our products pass national quality inspection and are insured by Ping An China.','本公司产品通过国家质量检测认证，由中国平安承保。')}</p></div>
@@ -319,8 +338,8 @@ def page_contact():
     <div class="cline"><b>{t('Email','邮箱')}</b><a href="mailto:{CO['email']}">{CO['email']}</a></div>
     <div class="cline"><b>{t('Address','地址')}</b><span>{t(CO['addr_en'], CO['addr_zh'])}</span></div>
     <div class="qr">
-      <figure><img src="assets/img/qr_wechat.png" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
-      <figure><img src="assets/img/qr_whatsapp.png" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
+      <figure><img src="{img('assets/img/qr_wechat.png')}" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
+      <figure><img src="{img('assets/img/qr_whatsapp.png')}" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
     </div>
     <p style="margin-top:18px"><a class="btn btn-green" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">{t('Chat on WhatsApp','WhatsApp 咨询')}</a></p>
   </div>
@@ -341,4 +360,11 @@ open(os.path.join(ROOT, 'assets', 'js', 'data.js'), 'w', encoding='utf-8').write
     'window.SENREX_DATA=' + json.dumps({'power': D['power'], 'battery': D['battery'], 'solar': D['solar'],
     'series': {k: [v[0], v[1]] for k, v in SERIES.items()}}, ensure_ascii=False) + ';\nwindow.SENREX_COUNTRIES='
     + json.dumps(json.load(open(os.path.join(ROOT, 'data', 'countries.json'), encoding='utf-8')), ensure_ascii=False) + ';')
+json.dump([{'key': k, 'en': v['en'], 'zh': v['zh']} for k, v in CATALOG.items()],
+          open(os.path.join(ROOT, 'data', 'texts_catalog.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+json.dump({'company': CO_DEFAULT, 'images': sorted(set(
+    [c[5] for c in CATS] + [f'assets/img/solar/{k}.jpg' for k in SERIES] + [f'assets/img/certs/cert{i}.jpg' for i in range(1, 6)] +
+    ['assets/img/logo_mark.png', 'assets/img/logo.png', 'assets/img/qr_wechat.png', 'assets/img/qr_whatsapp.png',
+     'assets/img/solar/hero_gsl.jpg', 'assets/img/showcase/alpine-1536.webp']))},
+    open(os.path.join(ROOT, 'data', 'site_defaults.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('built', TOTAL, 'models')

@@ -1,0 +1,36 @@
+{
+ "company": {
+  "en": "Tianchang Xianrui New Energy Technology Co., Ltd.",
+  "zh": "天长市先锐新能源科技有限公司",
+  "contact_en": "Mr. Liu Xianguo",
+  "contact_zh": "刘先国",
+  "mobile": "+86 190 1805 6828",
+  "wa": "8619018056828",
+  "tel": "0550 7702777",
+  "tel_link": "+865507702777",
+  "email": "834645912@qq.com",
+  "web": "www.senrex.cc",
+  "addr_zh": "安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋",
+  "addr_en": "Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China"
+ },
+ "images": [
+  "assets/img/certs/cert1.jpg",
+  "assets/img/certs/cert2.jpg",
+  "assets/img/certs/cert3.jpg",
+  "assets/img/certs/cert4.jpg",
+  "assets/img/certs/cert5.jpg",
+  "assets/img/logo.png",
+  "assets/img/logo_mark.png",
+  "assets/img/qr_wechat.png",
+  "assets/img/qr_whatsapp.png",
+  "assets/img/showcase/alpine-1536.webp",
+  "assets/img/showcase/battery.webp",
+  "assets/img/showcase/power.webp",
+  "assets/img/showcase/remote.webp",
+  "assets/img/showcase/solar.webp",
+  "assets/img/solar/gbp.jpg",
+  "assets/img/solar/gsl.jpg",
+  "assets/img/solar/gst.jpg",
+  "assets/img/solar/hero_gsl.jpg"
+ ]
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Senrex Admin · 网站管理</title>
+<link rel="icon" href="assets/img/logo_mark.png">
+<style>
+:root{--navy:#0d2f6e;--green:#5aa22d;--line:#dfe5ee;--bg:#f4f6fa;--muted:#5b6578;--red:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:#1b2333;font-size:15px}
+button,input,select,textarea{font:inherit}
+.hide{display:none!important}
+/* login */
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login .card{background:#fff;border-radius:16px;box-shadow:0 20px 50px -20px rgba(13,47,110,.35);padding:30px;width:100%;max-width:420px}
+.login img{height:60px;display:block;margin:0 auto 10px}
+.login h1{text-align:center;color:var(--navy);margin:0 0 4px;font-size:22px}
+.login p.sub{text-align:center;color:var(--muted);margin:0 0 20px;font-size:14px}
+label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 5px}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:10px 12px;border:1px solid #cdd6e3;border-radius:10px;background:#fff}
+textarea{min-height:70px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;background:var(--navy);color:#fff}
+.btn.green{background:var(--green)}
+.btn.light{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn.red{background:#fff;color:var(--red);border:1px solid #f0c9c4}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:default}
+.full{width:100%;justify-content:center;margin-top:18px}
+.msg{font-size:13px;margin-top:10px;min-height:18px}
+.msg.err{color:var(--red)} .msg.ok{color:#2e7d32}
+.help{font-size:12.5px;color:var(--muted);line-height:1.5}
+.help ol{padding-left:18px;margin:6px 0}
+/* app */
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 18px -12px rgba(13,47,110,.4)}
+header .in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header img{height:34px}
+header b{color:var(--navy);font-size:17px}
+header .sp{flex:1}
+#status{font-size:13px;color:var(--muted)}
+nav.tabs{max-width:1180px;margin:0 auto;padding:0 16px 10px;display:flex;gap:6px;overflow-x:auto}
+nav.tabs button{white-space:nowrap;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 14px;font-weight:700;color:var(--muted);cursor:pointer;font-size:13.5px}
+nav.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.bar input{max-width:320px}
+details.item{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+details.item>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 14px}
+details.item>summary::-webkit-details-marker{display:none}
+details.item>summary img{width:56px;height:56px;object-fit:contain;background:#f1f4f9;border-radius:8px}
+details.item>summary .t{font-weight:700}
+details.item>summary .s{font-size:13px;color:var(--muted)}
+details.item[open]>summary{border-bottom:1px solid var(--line);background:#fafcff}
+.fields{padding:12px 14px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 14px}
+.fields .wide{grid-column:1/-1}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.imgs{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.imgs figure{margin:0;text-align:center;font-size:12px;color:var(--muted)}
+.imgs figure img{width:110px;height:110px;object-fit:contain;background:#f1f4f9;border:1px solid var(--line);border-radius:10px;display:block;margin-bottom:4px}
+.imgs .x{color:var(--red);cursor:pointer}
+.actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+table.tx{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table.tx td{border-bottom:1px solid var(--line);padding:8px;vertical-align:top;width:50%}
+table.tx tr.changed td{background:#f4fbef}
+table.tx textarea{min-height:44px}
+.box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.box h3{margin:0 0 6px;color:var(--navy)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.imggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.imggrid .c{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:var(--muted);word-break:break-all}
+.imggrid img{width:100%;height:120px;object-fit:contain;background:#f1f4f9;border-radius:8px;margin-bottom:6px}
+.badge{display:inline-block;background:#eaf5e2;color:var(--green);border-radius:999px;padding:1px 8px;font-size:12px;font-weight:700}
+@media (max-width:760px){.fields{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}table.tx td{display:block;width:100%}}
+</style>
+</head>
+<body>
+
+<!-- Login / first-time setup -->
+<section class="login" id="login">
+  <div class="card">
+    <img src="assets/img/logo.png" alt="Senrex">
+    <h1>Website Admin · 网站管理</h1>
+    <p class="sub" id="loginSub">Log in to edit products, photos and texts<br>登录以编辑产品、图片和文字</p>
+    <form id="loginForm">
+      <label>Admin password · 管理密码</label>
+      <input type="password" id="pw" autocomplete="current-password" required>
+      <button class="btn full" type="submit">Log in · 登录</button>
+    </form>
+    <form id="setupForm" class="hide">
+      <label>GitHub access token · GitHub 令牌</label>
+      <input type="password" id="tok" autocomplete="off" required placeholder="github_pat_…">
+      <div class="help">Create once at github.com → Settings → Developer settings → Fine-grained tokens:
+        <ol><li>Repository access: only <b>junaed9156/Senrex</b></li><li>Permissions → Contents: <b>Read and write</b></li><li>Generate, copy and paste it here</li></ol>
+        The token is stored only in encrypted form, locked by your admin password.</div>
+      <label>New admin password · 设置管理密码</label>
+      <input type="password" id="pw1" autocomplete="new-password" minlength="10" required>
+      <label>Repeat password · 再次输入</label>
+      <input type="password" id="pw2" autocomplete="new-password" minlength="10" required>
+      <div class="help">Use at least 10 characters with letters and numbers. 至少10位，包含字母和数字。</div>
+      <button class="btn green full" type="submit">Save & start · 保存并开始</button>
+    </form>
+    <div class="msg" id="loginMsg"></div>
+    <p class="help" style="text-align:center;margin-top:14px"><a href="#" id="resetLink">Set up again / new token · 重新设置</a></p>
+  </div>
+</section>
+
+<!-- Editor -->
+<div id="app" class="hide">
+  <header>
+    <div class="in">
+      <img src="assets/img/logo_mark.png" alt=""><b>Senrex Admin</b>
+      <span class="sp"></span>
+      <span id="status"></span>
+      <a class="btn light sm" href="index.html" target="_blank" rel="noopener">View site · 查看网站</a>
+      <button class="btn green" id="saveBtn">Save all · 全部保存</button>
+      <button class="btn light sm" id="logoutBtn">Log out</button>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="power" class="on">Power stations · 储能电源</button>
+      <button data-tab="battery">Batteries · 锂电池</button>
+      <button data-tab="solar">Solar · 光储</button>
+      <button data-tab="remote">Remotes · 遥控器</button>
+      <button data-tab="texts">Texts EN/中文 · 网站文字</button>
+      <button data-tab="company">Company & photos · 公司与图片</button>
+      <button data-tab="settings">Password · 密码</button>
+    </nav>
+  </header>
+  <main id="main"></main>
+</div>
+
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
