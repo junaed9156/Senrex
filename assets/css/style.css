@@ -277,3 +277,6 @@ footer{background:linear-gradient(180deg,#0a2456,#071a40)}
 .card[data-kind="solar"] .pic img{object-fit:contain;height:auto;border-radius:8px}
 .card[data-kind="power"] .pic.fit{padding:14px;background:radial-gradient(120% 90% at 50% 15%,#fff 0%,#f1f5fb 60%,#e6edf7 100%)}
 .card[data-kind="power"] .pic.fit img{object-fit:contain;filter:drop-shadow(0 16px 14px rgba(13,47,110,.22))}
+/* golden frame around certificates */
+.certgrid img{padding:7px;border-radius:8px;background:linear-gradient(135deg,#8a6a12 0%,#d4af37 18%,#fff2b3 34%,#c9a227 50%,#f7e08a 66%,#a8841c 82%,#e9c95a 100%);box-shadow:0 0 0 1px #8a6a12,inset 0 0 0 1px rgba(255,255,255,.6),0 2px 4px rgba(0,0,0,.12),0 14px 30px -10px rgba(138,106,18,.55)}
+.certgrid img:hover{box-shadow:0 0 0 1px #8a6a12,0 4px 8px rgba(0,0,0,.14),0 22px 40px -12px rgba(138,106,18,.7)}
