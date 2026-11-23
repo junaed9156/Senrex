@@ -35,6 +35,14 @@ CO_DEFAULT = {
 }
 CO = dict(CO_DEFAULT, **{k: v for k, v in SITE.get('company', {}).items() if v})
 WA_LINK = 'https://wa.me/' + CO['wa']
+import hashlib
+def _ver(*paths):
+    h = hashlib.md5()
+    for p in paths:
+        try: h.update(open(os.path.join(ROOT, p), 'rb').read())
+        except Exception: pass
+    return h.hexdigest()[:8]
+VER = _ver('assets/css/style.css', 'assets/css/alpine.css', 'assets/js/main.js', 'data/products.json', 'data/site.json')
 CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="{img(f"assets/img/certs/cert{i}.jpg")}" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
 
 def e(s):
@@ -75,8 +83,8 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
 <title>{e(title_en)} | Senrex 赛恩力</title>
 <meta name="description" content="{e(desc)}">
 <link rel="icon" href="assets/img/logo_mark.png">
-<link rel="stylesheet" href="assets/css/style.css">
-<link rel="stylesheet" href="assets/css/alpine.css?v=studio">
+<link rel="stylesheet" href="assets/css/style.css?v={VER}">
+<link rel="stylesheet" href="assets/css/alpine.css?v={VER}">
 <script>try{{var l=localStorage.getItem('senrex-lang');if(!l){{l=(navigator.language||'').toLowerCase().indexOf('zh')===0?'zh-CN':'en'}}document.documentElement.lang=l}}catch(e){{}}</script>
 </head>
 <body data-page="{page}">
@@ -165,8 +173,8 @@ def foot():
 <div class="modal zoom" id="zmodal"><div class="box"><button class="x" data-close aria-label="Close">×</button><img alt=""></div></div>
 <div class="modal" id="imodal" role="dialog" aria-modal="true" aria-labelledby="inq-modal-title"><div class="box" style="display:block;max-width:640px"><button class="x" data-close aria-label="Close">×</button><div class="info">{inquiry_form('inq-modal')}</div></div></div>
 <script>window.SENREX={{email:{json.dumps(CO['email'])},wa:{json.dumps(CO['wa'])}}};</script>
-<script src="assets/js/data.js"></script>
-<script src="assets/js/main.js?v=studio"></script>
+<script src="assets/js/data.js?v={VER}"></script>
+<script src="assets/js/main.js?v={VER}"></script>
 </body></html>'''
 
 def ceo_section():
