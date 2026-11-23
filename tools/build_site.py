@@ -5,6 +5,7 @@ To add or change products, edit data/products.json (and put photos in assets/img
 then run this script again and commit the generated .html files.
 """
 import json, html, os, urllib.parse
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = json.load(open(os.path.join(ROOT, 'data', 'products.json'), encoding='utf-8'))
@@ -216,7 +217,9 @@ def page_products():
     # power
     pcards = ''
     for p in D['power']:
-        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic"><img src="assets/img/power/{p['imgs'][0]}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
+        _w, _h = Image.open(os.path.join(ROOT, 'assets/img/power', p['imgs'][0])).size
+        fit = ' fit' if _w / _h > 0.8 else ''
+        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic{fit}"><img src="assets/img/power/{p['imgs'][0]}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
 <div class="body"><span class="code">{p['id']}</span><h3>{t('Portable Power Station','便携式储能电源')}</h3><div class="meta">{e(p['power'])}</div>
 <div class="chips"><span class="chip">{e(p['capacity'][:40])}</span><span class="chip">{e(p['battery'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     bcards = ''
