@@ -141,7 +141,7 @@ def page_home():
     cats = ''.join(f'''<a class="cat" href="products.html#{k}"><div class="pic"><img src="{img}" alt="{e(en)}" loading="lazy"></div>
 <div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, img in CATS)
     return head('Lithium Battery Factory', 'home') + f'''
-<section class="hero" style="background-image:url(assets/img/solar/hero_gst.jpg)"><div class="wrap">
+<section class="hero" style="background-image:url(assets/img/solar/hero_gst.jpg)"><div class="wrap"><div class="glass">
   <span class="tag">{t('Lithium battery source factory','锂电池源头工厂')}</span>
   <h1>{t('Power for every journey, from cell to system','锂时代生活 · 驱动未来，不止于远')}</h1>
   <p>{t('Portable power stations, 48V–72V lithium battery packs, solar storage systems and inverters, made in Tianchang, Anhui. Wholesale from stock, dropshipping and export.','便携式储能电源、48V–72V 动力锂电池、光储一体机与逆变器，安徽天长生产。现货批发、一件代发、外贸出口。')}</p>
@@ -149,7 +149,7 @@ def page_home():
     <a class="btn btn-green" href="products.html">{t('View products','浏览产品')}</a>
     <a class="btn btn-line" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="18" height="18" fill="currentColor"')} WhatsApp</a>
   </div>
-</div></section>
+</div></div></section>
 <div class="stats"><div class="wrap">
   <div class="stat"><b>{TOTAL}</b><span>{t('product models','个产品型号')}</span></div>
   <div class="stat"><b>4</b><span>{t('product lines','大产品线')}</span></div>
