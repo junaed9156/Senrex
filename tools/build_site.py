@@ -31,7 +31,7 @@ CO_DEFAULT = {
     'addr_zh': '安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋',
     'addr_en': 'Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China',
     'ceo_name': 'Jack Liu', 'ceo_mobile': '+86 158 5501 5888', 'ceo_wa': '8615855015888', 'ceo_wechat': '15855015888',
-    'ceo2_name': 'Jason Liu', 'ceo2_name_zh': '刘先国', 'ceo2_mobile': '+86 131 3550 7999', 'ceo2_wa': '8613135507999',
+    'ceo2_name': 'Jason Liu', 'ceo2_name_zh': '刘先国', 'ceo2_mobile': '+86 131 3550 7999', 'ceo2_wa': '8613135507999', 'ceo2_wechat': '13135507999',
 }
 CO = dict(CO_DEFAULT, **{k: v for k, v in SITE.get('company', {}).items() if v})
 WA_LINK = 'https://wa.me/' + CO['wa']
@@ -192,7 +192,7 @@ def ceo_section():
               CO['ceo_wa'], CO['ceo_mobile'], CO['ceo_wechat'])
     c2 = card('assets/img/team/jason-liu.webp', CO['ceo2_name'], CO.get('ceo2_name_zh', ''), t('CEO · Remote Controls','首席执行官 · 遥控器'),
               t('Leads our remote control business: replacement AC and TV remotes for all major brands. Contact him directly for wholesale prices, OEM and bulk orders.','负责遥控器业务，提供各大品牌空调与电视替换遥控器。批发价格、OEM定制及大批量订单，欢迎直接联系。'),
-              CO['ceo2_wa'], CO['ceo2_mobile'])
+              CO['ceo2_wa'], CO['ceo2_mobile'], CO.get('ceo2_wechat'))
     return f'''<section class="s ceo-s"><div class="wrap">
   <div class="head"><div class="kicker">{t('Leadership','公司领导')}</div><h2>{t('Talk to our CEOs directly','直接联系我们的负责人')}</h2></div>
   <div class="leaders">{c1}{c2}</div>
