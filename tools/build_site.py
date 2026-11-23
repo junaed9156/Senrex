@@ -166,8 +166,8 @@ def foot():
   <div class="copy"><span>© 2026 {t(CO['en'], CO['zh'])}</span><span>{t('Reliable quality · Timely delivery · Superior service','可靠的质量 · 及时的供货 · 最佳的服务')}</span></div>
 </div></footer>
 <div class="float">
-  <a class="wa wa-name" href="https://wa.me/{CO['ceo_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo_name'].split()[0] + ', I am interested in Senrex energy storage products.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo_name'])}">{WA_SVG}<span>{e(CO['ceo_name'])}</span></a>
-  <a class="wa wa-name" href="https://wa.me/{CO['ceo2_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo2_name'].split()[0] + ', I am interested in Senrex remote controls.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo2_name'])}">{WA_SVG}<span>{e(CO['ceo2_name'])}</span></a>
+  <a class="wa wa-name" href="https://wa.me/{CO['ceo_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo_name'].split()[0] + ', I am interested in Senrex energy storage products.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo_name'])}">{WA_SVG}<span class="en">{e(CO['ceo_name'])}</span><span class="zh">{e(CO.get('ceo_name_zh') or CO['ceo_name'] + ' · 储能电源')}</span></a>
+  <a class="wa wa-name" href="https://wa.me/{CO['ceo2_wa']}?text={urllib.parse.quote('Hello ' + CO['ceo2_name'].split()[0] + ', I am interested in Senrex remote controls.')}" target="_blank" rel="noopener" aria-label="WhatsApp {e(CO['ceo2_name'])}">{WA_SVG}<span class="en">{e(CO['ceo2_name'])}</span><span class="zh">{e(CO.get('ceo2_name_zh') or CO['ceo2_name'])} · 遥控器</span></a>
   <a class="em" href="contact.html#form">{MAIL_SVG}{t('Email sales','邮件询价')}</a>
 </div>
 <div class="modal" id="pmodal"><div class="box"><button class="x" data-close aria-label="Close">×</button><div class="gal"></div><div class="info"></div></div></div>
