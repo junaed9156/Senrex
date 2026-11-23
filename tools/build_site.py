@@ -36,10 +36,10 @@ WA_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0
 MAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.4 7 12 11.4 18.6 7H5.4z"/></svg>'
 
 CATS = [
-    ('power', 'Portable Power Stations', '便携式储能电源', 'Outdoor & home backup power, 150W to 11,000W, NMC and LiFePO4.', '户外及家庭备用电源，150W–11000W，三元锂 / 磷酸铁锂。', 'assets/img/power/ps05.jpg'),
-    ('battery', 'Lithium Battery Packs', '动力锂电池组', '48V / 60V / 72V packs from 12Ah to 230Ah, NMC and LiFePO4.', '48V / 60V / 72V，12Ah–230Ah，三元锂 / 磷酸铁锂。', 'assets/img/battery/72V150Ah.jpg'),
-    ('solar', 'Solar Storage & Inverters', '光储一体机与逆变器', 'GSL-LinkI all-in-one systems, GBP-Pro I batteries, GST hybrid inverters.', 'GSL-LinkI 光储一体机、GBP-Pro I 低压电池、GST 逆变器。', 'assets/img/solar/gsl.jpg'),
-    ('remote', 'Remote Controls', '遥控器', 'Replacement AC and TV remotes for all major brands.', '各大品牌空调与电视替换遥控器。', 'assets/img/remote/ac-universal.jpg'),
+    ('power', 'Portable Power Stations', '便携式储能电源', 'Outdoor & home backup power, 150W to 11,000W, NMC and LiFePO4.', '户外及家庭备用电源，150W–11000W，三元锂 / 磷酸铁锂。', 'assets/img/showcase/power.webp'),
+    ('battery', 'Lithium Battery Packs', '动力锂电池组', '48V / 60V / 72V packs from 12Ah to 230Ah, NMC and LiFePO4.', '48V / 60V / 72V，12Ah–230Ah，三元锂 / 磷酸铁锂。', 'assets/img/showcase/battery.webp'),
+    ('solar', 'Solar Storage & Inverters', '光储一体机与逆变器', 'GSL-LinkI all-in-one systems, GBP-Pro I batteries, GST hybrid inverters.', 'GSL-LinkI 光储一体机、GBP-Pro I 低压电池、GST 逆变器。', 'assets/img/showcase/solar.webp'),
+    ('remote', 'Remote Controls', '遥控器', 'Replacement AC and TV remotes for all major brands.', '各大品牌空调与电视替换遥控器。', 'assets/img/showcase/remote.webp'),
 ]
 COUNTS = {'power': len(D['power']), 'battery': len(D['battery']), 'solar': len(D['solar']),
           'remote': sum(len(r['models']) for r in D['remote'])}
@@ -55,6 +55,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
 <meta name="description" content="{e(desc)}">
 <link rel="icon" href="assets/img/logo_mark.png">
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/alpine.css">
 <script>try{{var l=localStorage.getItem('senrex-lang');if(!l){{l=(navigator.language||'').toLowerCase().indexOf('zh')===0?'zh-CN':'en'}}document.documentElement.lang=l}}catch(e){{}}</script>
 </head>
 <body data-page="{page}">
@@ -64,7 +65,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
   <a href="mailto:{CO['email']}">✉ {CO['email']}</a>
 </div></div>
 <header class="nav"><div class="wrap">
-  <a class="brand" href="index.html"><img src="assets/img/logo_mark.png" alt="Senrex logo"><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
+  <a class="brand" href="index.html"><span class="brand-depth" aria-hidden="true"><img src="assets/img/logo_mark.png" width="158" height="160" alt=""></span><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
   <nav class="menu" id="menu">
     <a href="index.html" data-p="home">{t('Home','首页')}</a>
     <a href="products.html" data-p="products">{t('Products','产品中心')}</a>
@@ -140,13 +141,17 @@ def foot():
 
 # ---------------- HOME ----------------
 def page_home():
-    cats = ''.join(f'''<a class="cat" href="products.html#{k}"><div class="pic"><img src="{img}" alt="{e(en)}" loading="lazy"></div>
+    cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{img}" alt="{e(en)}" loading="lazy"></div>
 <div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, img in CATS)
     return head('Lithium Battery Factory', 'home') + f'''
-<section class="hero" style="background-image:url(assets/img/solar/hero_gst.jpg)"><div class="wrap"><div class="glass">
+<section class="hero alpine">
+  <picture class="alpine-scene">
+    <img src="assets/img/showcase/alpine-1536.webp" srcset="assets/img/showcase/alpine-900.webp 900w, assets/img/showcase/alpine-1536.webp 1536w" sizes="100vw" width="1536" height="1024" fetchpriority="high" alt="">
+  </picture>
+  <div class="wrap"><div class="hero-copy">
   <span class="tag">{t('Lithium battery source factory','锂电池源头工厂')}</span>
-  <h1>{t('Power for every journey, from cell to system','锂时代生活 · 驱动未来，不止于远')}</h1>
-  <p>{t('Portable power stations, 48V–72V lithium battery packs, solar storage systems and inverters, made in Tianchang, Anhui. Wholesale from stock, dropshipping and export.','便携式储能电源、48V–72V 动力锂电池、光储一体机与逆变器，安徽天长生产。现货批发、一件代发、外贸出口。')}</p>
+  <h1>{t('Power for<br>every <em>journey.</em>','澎湃动力<br><em>随行致远。</em>')}</h1>
+  <p>{t('Portable power stations, lithium batteries and solar storage systems. Factory-direct from Tianchang, China.','便携式储能电源、动力锂电池与光储系统。安徽天长，厂家直供。')}</p>
   <div class="cta">
     <a class="btn btn-green" href="products.html">{t('View products','浏览产品')}</a>
     <a class="btn btn-line" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="18" height="18" fill="currentColor"')} WhatsApp</a>
