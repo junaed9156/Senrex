@@ -11,7 +11,11 @@
   "email": "834645912@qq.com",
   "web": "www.senrex.cc",
   "addr_zh": "安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋",
-  "addr_en": "Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China"
+  "addr_en": "Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China",
+  "ceo_name": "Jack Liu",
+  "ceo_mobile": "+86 158 5501 5888",
+  "ceo_wa": "8615855015888",
+  "ceo_wechat": "15855015888"
  },
  "images": [
   "assets/img/certs/cert1.jpg",
@@ -31,6 +35,7 @@
   "assets/img/solar/gbp.jpg",
   "assets/img/solar/gsl.jpg",
   "assets/img/solar/gst.jpg",
-  "assets/img/solar/hero_gsl.jpg"
+  "assets/img/solar/hero_gsl.jpg",
+  "assets/img/team/jack-liu.webp"
  ]
 }

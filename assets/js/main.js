@@ -30,6 +30,20 @@
     }, 650);
   });
 
+  /* WeChat button: copy the WeChat ID, then try to open WeChat */
+  document.querySelectorAll('[data-wechat]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var id = b.dataset.wechat, zh = html.lang === 'zh-CN';
+      var done = function () {
+        var t = document.createElement('div'); t.className = 'toast';
+        t.textContent = zh ? ('微信号 ' + id + ' 已复制，请在微信中添加好友') : ('WeChat ID ' + id + ' copied. Open WeChat › Add Contacts and paste it.');
+        document.body.appendChild(t); setTimeout(function () { t.remove(); }, 4500);
+        setTimeout(function () { location.href = 'weixin://'; }, 900);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(id).then(done, done); else done();
+    });
+  });
+
   /* menu */
   var page = document.body.dataset.page;
   document.querySelectorAll('.menu a[data-p]').forEach(function (a) { if (a.dataset.p === page) a.classList.add('on'); });

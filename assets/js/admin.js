@@ -322,7 +322,8 @@
     var C = state.site.company, D = state.defaults.company || {};
     var labels = { en: 'Company name (English)', zh: 'Company name (中文)', contact_en: 'Contact person (English)', contact_zh: 'Contact person (中文)',
       mobile: 'Mobile shown on site (e.g. +86 190 1805 6828)', wa: 'WhatsApp number, digits only (e.g. 8619018056828)', tel: 'Office phone shown', tel_link: 'Office phone for dialing (e.g. +865507702777)',
-      email: 'Sales email (inquiries go here)', web: 'Website', addr_en: 'Address (English)', addr_zh: 'Address (中文)' };
+      email: 'Sales email (inquiries go here)', web: 'Website', addr_en: 'Address (English)', addr_zh: 'Address (中文)',
+      ceo_name: 'CEO name · 总经理姓名', ceo_mobile: 'CEO mobile shown · 总经理电话', ceo_wa: 'CEO WhatsApp, digits only · 总经理 WhatsApp（仅数字）', ceo_wechat: 'CEO WeChat ID · 总经理微信号' };
     var box = el('div', { class: 'box' }, '<h3>Company & contact · 公司与联系方式</h3><p class="help">Empty box = keep the original. 留空则保持原文。</p>');
     var g = el('div', { class: 'grid2' });
     Object.keys(labels).forEach(function (k) {
