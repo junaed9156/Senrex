@@ -45,6 +45,9 @@ COUNTS = {'power': len(D['power']), 'battery': len(D['battery']), 'solar': len(D
           'remote': sum(len(r['models']) for r in D['remote'])}
 TOTAL = sum(COUNTS.values())
 
+# Closely spaced silhouettes give the original mark a visible edge as it turns.
+LOGO_EDGES = ''.join(f'<i style="--depth:{z}px"></i>' for z in range(-3, 4))
+
 def head(title_en, page, desc='Senrex lithium battery factory: portable power stations, 48V/60V/72V lithium battery packs, solar storage systems, inverters and remote controls. Wholesale and export.'):
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -55,7 +58,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
 <meta name="description" content="{e(desc)}">
 <link rel="icon" href="assets/img/logo_mark.png">
 <link rel="stylesheet" href="assets/css/style.css">
-<link rel="stylesheet" href="assets/css/alpine.css">
+<link rel="stylesheet" href="assets/css/alpine.css?v=studio">
 <script>try{{var l=localStorage.getItem('senrex-lang');if(!l){{l=(navigator.language||'').toLowerCase().indexOf('zh')===0?'zh-CN':'en'}}document.documentElement.lang=l}}catch(e){{}}</script>
 </head>
 <body data-page="{page}">
@@ -65,7 +68,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
   <a href="mailto:{CO['email']}">✉ {CO['email']}</a>
 </div></div>
 <header class="nav"><div class="wrap">
-  <a class="brand" href="index.html"><span class="brand-depth" aria-hidden="true"><img src="assets/img/logo_mark.png" width="158" height="160" alt=""></span><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
+  <a class="brand" href="index.html"><span class="brand-depth" aria-hidden="true"><img src="assets/img/logo_mark.png" width="158" height="160" alt="">{LOGO_EDGES}</span><span><b>SENREX</b><small>{t('Xianrui New Energy','先锐新能源')}</small></span></a>
   <nav class="menu" id="menu">
     <a href="index.html" data-p="home">{t('Home','首页')}</a>
     <a href="products.html" data-p="products">{t('Products','产品中心')}</a>
@@ -78,29 +81,37 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
 '''
 
 def inquiry_form(prefill_id='inq'):
-    LINE_OPTS = ''.join(f'<option value="{en}">{en} / {zh}</option>' for k, en, zh, *_ in CATS)
+    line_options = ''.join(f'<option value="{en}">{en} / {zh}</option>' for _, en, zh, *_ in CATS)
+    def field(name, en, zh, attrs='', tag='input', options=''):
+        field_id = f'{prefill_id}-{name}'
+        control = f'<{tag} id="{field_id}" name="{name}" {attrs}>'
+        if tag != 'input':
+            control += options + f'</{tag}>'
+        return f'<div class="field"><label for="{field_id}">{t(en, zh)}</label>{control}</div>'
+
+    empty = '<option value="">—</option>'
+    name = field('name', 'Your name *', '您的姓名 *', 'autocomplete="name" required')
+    email = field('email', 'Email address *', '电子邮箱 *', 'type="email" autocomplete="email" required')
+    message = field('message', 'What do you need? *', '您的需求 *', 'rows="4" required', tag='textarea')
+    company = field('company', 'Company', '公司名称', 'autocomplete="organization"')
+    phone = field('phone', 'Phone / WhatsApp', '电话 / WhatsApp', 'type="tel" autocomplete="tel"')
+    country = field('country', 'Country', '国家', 'class="country-select"', tag='select', options=empty)
+    quantity = field('quantity', 'Order quantity', '采购数量')
+    line = field('product_line', 'Product line', '产品线', tag='select', options=empty + line_options)
+    model = field('product', 'Model', '型号', 'placeholder="48V100Ah"')
     return f'''<form class="inq" id="{prefill_id}" novalidate>
-  <div class="row">
-    <div><label>{t('Your name *','您的姓名 *')}</label><input name="name" required></div>
-    <div><label>{t('Company','公司名称')}</label><input name="company"></div>
+  <div class="inquiry-intro"><span class="mail-seal" aria-hidden="true">{MAIL_SVG}</span>
+    <div><h2 id="{prefill_id}-title">{t('Request a quotation', '获取报价')}</h2><p>{t('Tell our sales team what you’re sourcing and when you need it.', '告诉销售团队您想采购的产品及交付时间。')}</p></div>
   </div>
-  <div class="row">
-    <div><label>{t('Email *','邮箱 *')}</label><input name="email" type="email" required></div>
-    <div><label>{t('Phone / WhatsApp','电话 / WhatsApp')}</label><input name="phone" type="tel" placeholder="+86 …"></div>
-  </div>
-  <div class="row">
-    <div><label>{t('Country','国家')}</label><select name="country" class="country-select"><option value="">—</option></select></div>
-    <div><label>{t('Order quantity','采购数量')}</label><input name="quantity" placeholder="e.g. 200 pcs"></div>
-  </div>
-  <div class="row">
-    <div><label>{t('Product line','产品线')}</label><select name="product_line"><option value="">—</option>{LINE_OPTS}</select></div>
-    <div><label>{t('Model','型号')}</label><input name="product" placeholder="e.g. 48V100Ah"></div>
-  </div>
-  <div><label>{t('Message * (specs, battery type, packaging, target price, delivery date)','留言 *（规格、电池类型、包装、目标价格、交期）')}</label><textarea name="message" required></textarea></div>
+  <div class="row">{name}{email}</div>
+  {message}
+  <details class="order-details"><summary>{t('Product & contact details','产品与联系信息')}</summary>
+    <div class="order-fields"><div class="row">{line}{model}</div><div class="row">{quantity}{company}</div><div class="row">{country}{phone}</div></div>
+  </details>
   <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-  <button class="btn btn-green" type="submit">{t('Send Inquiry','发送询盘')}</button>
-  <p class="note msg" aria-live="polite"></p>
-  <p class="note">{t('Your inquiry goes straight to our sales email. We reply within 24 hours.','询盘将直接发送至我们的销售邮箱，24小时内回复。')}</p>
+  <div class="inquiry-send"><button class="btn btn-green" type="submit">{MAIL_SVG}{t('Open email draft','打开邮件草稿')}</button>
+    <span>{t('Reply within 24 hours','24 小时内回复')}</span></div>
+  <p class="note msg" role="status" aria-live="polite"></p>
 </form>'''
 
 def foot():
@@ -129,14 +140,14 @@ def foot():
 </div></footer>
 <div class="float">
   <a class="wa" href="{wa('Hello Senrex, I am interested in your products.')}" target="_blank" rel="noopener" aria-label="WhatsApp">{WA_SVG}</a>
-  <a class="em" href="contact.html#form" aria-label="Inquiry">{MAIL_SVG}</a>
+  <a class="em" href="contact.html#form">{MAIL_SVG}{t('Email sales','邮件询价')}</a>
 </div>
 <div class="modal" id="pmodal"><div class="box"><button class="x" data-close aria-label="Close">×</button><div class="gal"></div><div class="info"></div></div></div>
 <div class="modal zoom" id="zmodal"><div class="box"><button class="x" data-close aria-label="Close">×</button><img alt=""></div></div>
-<div class="modal" id="imodal"><div class="box" style="display:block;max-width:640px"><button class="x" data-close aria-label="Close">×</button><div class="info"><h2>{t('Send an inquiry','发送询盘')}</h2>{inquiry_form('inq-modal')}</div></div></div>
+<div class="modal" id="imodal" role="dialog" aria-modal="true" aria-labelledby="inq-modal-title"><div class="box" style="display:block;max-width:640px"><button class="x" data-close aria-label="Close">×</button><div class="info">{inquiry_form('inq-modal')}</div></div></div>
 <script>window.SENREX={{email:{json.dumps(CO['email'])},wa:{json.dumps(CO['wa'])}}};</script>
 <script src="assets/js/data.js"></script>
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js?v=studio"></script>
 </body></html>'''
 
 # ---------------- HOME ----------------
@@ -189,7 +200,7 @@ def page_home():
   <div class="cbox">
     <div class="kicker">{t('Contact us','联系我们')}</div>
     <h3 style="font-size:24px;margin-top:6px">{t('Get a quotation in 24 hours','24小时内获取报价')}</h3>
-    <p style="color:var(--muted)">{t('Send your inquiry below. It goes straight to our sales email. You can also reach us directly:','请填写右侧询盘表单，询盘将直接发送至我们的销售邮箱。您也可以直接联系我们：')}</p>
+    <p style="color:var(--muted)">{t('For pricing, specifications or delivery dates, write to our sales team or contact us directly.','请填写右侧询盘表单，询盘将直接发送至我们的销售邮箱。您也可以直接联系我们：')}</p>
     <div class="cline"><b>WhatsApp</b><a href="{WA_LINK}" target="_blank" rel="noopener">{CO['mobile']}</a></div>
     <div class="cline"><b>{t('WeChat','微信')}</b><span>{CO['mobile']}</span></div>
     <div class="cline"><b>{t('Tel','座机')}</b><a href="tel:{CO['tel_link']}">{CO['tel']}</a></div>
@@ -200,7 +211,6 @@ def page_home():
     </div>
   </div>
   <div class="cbox">
-    <h3>{t('Send an inquiry','发送询盘')}</h3>
     {inquiry_form('inq-home')}
   </div>
 </div></section>
@@ -315,7 +325,6 @@ def page_contact():
     <p style="margin-top:18px"><a class="btn btn-green" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">{t('Chat on WhatsApp','WhatsApp 咨询')}</a></p>
   </div>
   <div class="cbox" id="form">
-    <h3>{t('Send an inquiry','发送询盘')}</h3>
     {inquiry_form('inq-page')}
   </div>
 </div></section>

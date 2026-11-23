@@ -23,8 +23,29 @@
   if (burger) burger.addEventListener('click', function () { document.getElementById('menu').classList.toggle('open'); });
 
   /* modals */
-  function open(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
-  function close(m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+  var returnFocus;
+  var inertBackground = [];
+  function open(id) {
+    var modal = document.getElementById(id);
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (id === 'imodal') {
+      inertBackground = Array.from(document.body.children).filter(function (element) {
+        return element !== modal && element.tagName !== 'SCRIPT' && !element.inert;
+      });
+      inertBackground.forEach(function (element) { element.inert = true; });
+      modal.querySelector('[name="name"]').focus();
+    }
+  }
+  function close(m) {
+    m.classList.remove('open');
+    document.body.style.overflow = '';
+    if (m.id === 'imodal') {
+      inertBackground.forEach(function (element) { element.inert = false; });
+      inertBackground = [];
+      if (returnFocus) returnFocus.focus({ preventScroll: true });
+    }
+  }
   document.querySelectorAll('.modal').forEach(function (m) {
     m.addEventListener('click', function (ev) { if (ev.target === m || ev.target.hasAttribute('data-close')) close(m); });
   });
@@ -94,9 +115,19 @@
     var b = ev.target.closest('[data-inq]');
     if (!b) return;
     close(document.getElementById('pmodal'));
+    returnFocus = document.querySelector('.float .em');
     var f = document.getElementById('inq-modal');
     f.product.value = b.dataset.inq;
     if (b.dataset.line) f.product_line.value = b.dataset.line;
+    f.querySelector('.order-details').open = true;
+    open('imodal');
+  });
+
+  var emailLink = document.querySelector('.float .em');
+  emailLink.addEventListener('click', function (event) {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    returnFocus = emailLink;
     open('imodal');
   });
 
@@ -117,42 +148,33 @@
     });
   });
 
-  /* inquiry submit: sent to the company email through FormSubmit */
-  document.querySelectorAll('form.inq').forEach(function (f) {
-    f.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      var msg = f.querySelector('.msg');
-      if (f._honey.value) return;
-      if (!f.elements['name'].value.trim() || !f.email.value.trim() || !f.message.value.trim()) {
-        msg.textContent = isZh() ? '请填写姓名、邮箱和留言。' : 'Please fill in your name, email and message.'; msg.style.color = '#c0392b'; return;
+  /* Prepare a draft addressed directly to the sales team in the visitor's mail app. */
+  document.querySelectorAll('form.inq').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (form.elements._honey.value) return;
+      var status = form.querySelector('.msg');
+      var missing = ['name', 'email', 'message'].map(function (key) { return form.elements[key]; })
+        .find(function (field) { return !field.value.trim(); });
+      if (missing || !form.elements.email.validity.valid) {
+        (missing || form.elements.email).focus();
+        status.dataset.state = 'error';
+        status.textContent = missing
+          ? (isZh() ? '请填写姓名、邮箱和留言。' : 'Please fill in your name, email and message.')
+          : (isZh() ? '请输入有效的电子邮箱。' : 'Please enter a valid email address.');
+        return;
       }
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) {
-        msg.textContent = isZh() ? '请输入有效的邮箱地址。' : 'Please enter a valid email address.'; msg.style.color = '#c0392b'; return;
-      }
-      var data = {
-        _subject: 'Website inquiry: ' + (f.product.value || f.product_line.value || 'General') + ' — ' + f.elements['name'].value,
-        _template: 'table', _captcha: 'false', _replyto: f.email.value,
-        Name: f.elements['name'].value, Company: f.company.value, Email: f.email.value, 'Phone / WhatsApp': f.phone.value,
-        Country: f.country.value, 'Order quantity': f.quantity.value, 'Product line': f.product_line.value,
-        Model: f.product.value, Message: f.message.value, Page: location.href
-      };
-      var btn = f.querySelector('button[type=submit]'); btn.disabled = true;
-      msg.style.color = ''; msg.textContent = isZh() ? '正在发送…' : 'Sending…';
-      fetch('https://formsubmit.co/ajax/' + CFG.email, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data)
-      }).then(function (r) { return r.json(); }).then(function (r) {
-        if (r && (r.success === true || r.success === 'true')) {
-          msg.style.color = '#2e7d32';
-          msg.textContent = isZh() ? '询盘已发送，我们将在24小时内回复您。' : 'Thank you! Your inquiry has been sent. We will reply within 24 hours.';
-          f.reset();
-        } else { throw new Error('fail'); }
-      }).catch(function () {
-        var body = Object.keys(data).filter(function (k) { return k.charAt(0) !== '_'; }).map(function (k) { return k + ': ' + data[k]; }).join('\n');
-        msg.style.color = '#c0392b';
-        msg.innerHTML = (isZh() ? '发送失败，请直接' : 'Could not send. Please ') +
-          '<a style="text-decoration:underline" href="mailto:' + CFG.email + '?subject=' + encodeURIComponent(data._subject) + '&body=' + encodeURIComponent(body) + '">' + (isZh() ? '发邮件' : 'email us') + '</a>' +
-          (isZh() ? '或' : ' or ') + '<a style="text-decoration:underline" target="_blank" rel="noopener" href="' + waLink(body) + '">WhatsApp</a>.';
-      }).then(function () { btn.disabled = false; });
+      var labels = {name: 'Name', email: 'Email', company: 'Company', phone: 'Phone / WhatsApp',
+        country: 'Country', quantity: 'Order quantity', product_line: 'Product line', product: 'Model'};
+      var lines = Object.keys(labels).filter(function (key) { return form.elements[key].value.trim(); })
+        .map(function (key) { return labels[key] + ': ' + form.elements[key].value.trim(); });
+      var subject = 'Senrex quotation — ' + (form.elements.product.value || form.elements.product_line.value || form.elements.name.value);
+      var body = lines.join('\n') + '\n\n' + form.elements.message.value.trim();
+      var draft = 'mailto:' + CFG.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      status.dataset.state = 'draft';
+      status.textContent = (isZh() ? '在邮件应用中确认并发送。若未打开，请发邮件至 ' :
+        'Review and send in your email app. If it didn’t open, email ') + CFG.email + '.';
+      window.location.href = draft;
     });
   });
 
