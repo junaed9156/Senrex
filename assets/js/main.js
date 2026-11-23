@@ -51,6 +51,16 @@
         row('Input voltage', '输入电压', p.input) + row('Waveform', '输出波形', p.wave) + row('AC outlets', 'AC 插座', p.ac) +
         row('USB', 'USB', p.usb) + row('Type-C', 'Type-C', p.typec) + row('Car port', '点烟器', p.car) + row('Solar input', '太阳能输入', p.solar) +
         row('Size', '尺寸', p.size) + row('Net weight', '净重', p.weight);
+    } else if (kind === 'solar') {
+      p = DATA.solar[+id];
+      var sn = DATA.series[p.series];
+      imgs = ['assets/img/solar/' + p.series + '.jpg'];
+      name = sn[0] + ' ' + p.model;
+      title = esc(p.model) + ' <small style="display:block;font-size:15px;color:var(--muted);font-weight:600">' + L(sn[0], sn[1]) + '</small>';
+      p = Object.assign({}, p, { id: p.series.toUpperCase() + ' ' + p.model });
+      rows = (p.rated !== '—' ? row('Rated power (W)', '额定功率 (W)', p.rated) + row('Peak power (W)', '峰值功率 (W)', p.peak) : '') +
+        row('Battery voltage', '电池电压', p.bv) + (p.cap !== '—' ? row('Battery capacity', '电池容量', p.cap) : '') +
+        row('Key specs', '主要参数', p.specs) + row('Size (mm)', '尺寸 (mm)', p.size) + row('Weight (kg)', '重量 (kg)', p.weight);
     } else {
       p = DATA.battery.filter(function (x) { return x.id === id; })[0];
       imgs = ['assets/img/battery/' + p.img];
@@ -72,7 +82,7 @@
     m.querySelector('.info').innerHTML = '<span class="code" style="color:var(--green-2);font-weight:800;font-size:13px">' + esc(p.id) + '</span><h2>' + title + '</h2>' +
       '<div class="tscroll"><table class="t">' + rows + '</table></div>' +
       '<div class="actions"><a class="btn btn-green" target="_blank" rel="noopener" href="' + waLink('Hello Senrex, I am interested in ' + name + ' (' + p.id + '). Please send me the price.') + '">WhatsApp</a>' +
-      '<button class="btn btn-navy" type="button" data-inq="' + esc(name + ' (' + p.id + ')') + '" data-line="' + (kind === 'power' ? 'Portable Power Stations' : 'Lithium Battery Packs') + '">' + L('Send inquiry', '发送询盘') + '</button></div>';
+      '<button class="btn btn-navy" type="button" data-inq="' + esc(name + ' (' + p.id + ')') + '" data-line="' + ({ power: 'Portable Power Stations', battery: 'Lithium Battery Packs', solar: 'Solar Storage & Inverters' })[kind] + '">' + L('Send inquiry', '发送询盘') + '</button></div>';
     open('pmodal');
   }
   document.querySelectorAll('.card[data-kind]').forEach(function (c) {
@@ -88,6 +98,23 @@
     f.product.value = b.dataset.inq;
     if (b.dataset.line) f.product_line.value = b.dataset.line;
     open('imodal');
+  });
+
+  /* country list with automatic dial code */
+  var COUNTRIES = window.SENREX_COUNTRIES || [];
+  document.querySelectorAll('select.country-select').forEach(function (sel) {
+    var pri = ['CN', 'US', 'GB', 'DE', 'AE', 'SA', 'IN', 'BD', 'PK', 'NG', 'BR', 'RU'];
+    function opt(c) { var o = document.createElement('option'); o.value = c[1]; o.dataset.code = c[3]; o.textContent = c[1] + ' / ' + c[2] + ' (+' + c[3] + ')'; return o; }
+    var g1 = document.createElement('optgroup'); g1.label = '★';
+    pri.forEach(function (k) { var c = COUNTRIES.filter(function (x) { return x[0] === k; })[0]; if (c) g1.appendChild(opt(c)); });
+    var g2 = document.createElement('optgroup'); g2.label = 'A–Z';
+    COUNTRIES.forEach(function (c) { g2.appendChild(opt(c)); });
+    sel.appendChild(g1); sel.appendChild(g2);
+    sel.addEventListener('change', function () {
+      var o = sel.options[sel.selectedIndex]; if (!o || !o.dataset.code) return;
+      var ph = sel.form.elements['phone'], v = ph.value.trim().replace(/^\+\d{1,4}\s*/, '');
+      ph.value = '+' + o.dataset.code + ' ' + v; ph.focus();
+    });
   });
 
   /* inquiry submit: sent to the company email through FormSubmit */

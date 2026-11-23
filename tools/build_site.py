@@ -20,6 +20,7 @@ CO = {
     'addr_en': 'Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China',
 }
 WA_LINK = 'https://wa.me/' + CO['wa']
+CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="assets/img/certs/cert{i}.jpg" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
 
 def e(s):
     return html.escape(str(s))
@@ -83,10 +84,10 @@ def inquiry_form(prefill_id='inq'):
   </div>
   <div class="row">
     <div><label>{t('Email *','邮箱 *')}</label><input name="email" type="email" required></div>
-    <div><label>{t('Phone / WhatsApp','电话 / WhatsApp')}</label><input name="phone"></div>
+    <div><label>{t('Phone / WhatsApp','电话 / WhatsApp')}</label><input name="phone" type="tel" placeholder="+86 …"></div>
   </div>
   <div class="row">
-    <div><label>{t('Country','国家')}</label><input name="country"></div>
+    <div><label>{t('Country','国家')}</label><select name="country" class="country-select"><option value="">—</option></select></div>
     <div><label>{t('Order quantity','采购数量')}</label><input name="quantity" placeholder="e.g. 200 pcs"></div>
   </div>
   <div class="row">
@@ -176,11 +177,30 @@ def page_home():
     <p>{t('A technology-based enterprise deeply involved in the lithium battery industry chain, located in the New Energy Industry Base of Tianchang City, Anhui Province. We produce and sell lithium batteries, photovoltaic modules and inverters, and also design and build solar power and electrical projects.','一家深耕锂电池产业链的科技型企业，坐落于安徽省天长市新能源产业基地。主营锂电池、光伏组件、逆变器等产品生产销售，同时承接光伏发电及电力工程设计施工业务。')}</p>
     <a class="btn btn-navy" href="about.html">{t('Learn more','了解更多')}</a>
   </div>
-  <img class="certs" src="assets/img/certs.jpg" alt="Quality inspection reports" loading="lazy">
+  {CERTGRID_HTML}
+</div></section>
+<section class="s alt" id="inquiry"><div class="wrap contact">
+  <div class="cbox">
+    <div class="kicker">{t('Contact us','联系我们')}</div>
+    <h3 style="font-size:24px;margin-top:6px">{t('Get a quotation in 24 hours','24小时内获取报价')}</h3>
+    <p style="color:var(--muted)">{t('Send your inquiry below. It goes straight to our sales email. You can also reach us directly:','请填写右侧询盘表单，询盘将直接发送至我们的销售邮箱。您也可以直接联系我们：')}</p>
+    <div class="cline"><b>WhatsApp</b><a href="{WA_LINK}" target="_blank" rel="noopener">{CO['mobile']}</a></div>
+    <div class="cline"><b>{t('WeChat','微信')}</b><span>{CO['mobile']}</span></div>
+    <div class="cline"><b>{t('Tel','座机')}</b><a href="tel:{CO['tel_link']}">{CO['tel']}</a></div>
+    <div class="cline"><b>{t('Email','邮箱')}</b><a href="mailto:{CO['email']}">{CO['email']}</a></div>
+    <div class="qr">
+      <figure><img src="assets/img/qr_wechat.png" alt="WeChat QR code"><figcaption>{t('WeChat','微信')}</figcaption></figure>
+      <figure><img src="assets/img/qr_whatsapp.png" alt="WhatsApp QR code"><figcaption>WhatsApp</figcaption></figure>
+    </div>
+  </div>
+  <div class="cbox">
+    <h3>{t('Send an inquiry','发送询盘')}</h3>
+    {inquiry_form('inq-home')}
+  </div>
 </div></section>
 <section class="ctaband"><div class="wrap">
   <div><h2>{t('Need a quotation?','需要报价？')}</h2><p>{t('Tell us the model and quantity. We reply within 24 hours.','告诉我们型号和数量，24小时内回复。')}</p></div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn btn-green" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="contact.html#form">{t('Send inquiry','发送询盘')}</a></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn btn-green" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-line" href="#inquiry">{t('Send inquiry','发送询盘')}</a></div>
 </div></section>
 ''' + foot()
 
@@ -207,15 +227,14 @@ def page_products():
 <div class="chips"><span class="chip">{chem}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     sol = ''
     for key, (en, zh, den, dzh) in SERIES.items():
-        rows = [s for s in D['solar'] if s['series'] == key]
-        if key == 'gbp':
-            hdr = f'<tr><th>{t("Model","型号")}</th><th>{t("Voltage","电压")}</th><th>{t("Capacity","容量")}</th><th>{t("Size (mm)","尺寸 (mm)")}</th><th>{t("Weight (kg)","重量 (kg)")}</th><th></th></tr>'
-            body = ''.join(f'<tr><td><b>{e(s["model"])}</b></td><td>{e(s["bv"])}</td><td>{e(s["cap"])}</td><td>{e(s["size"])}</td><td>{e(s["weight"])}</td><td><a class="btn btn-sm btn-green" href="{wa("Hello Senrex, I am interested in GBP-Pro I " + s["model"])}" target="_blank" rel="noopener">{t("Inquire","询价")}</a></td></tr>' for s in rows)
-        else:
-            hdr = f'<tr><th>{t("Model","型号")}</th><th>{t("Rated (W)","额定功率 (W)")}</th><th>{t("Peak (W)","峰值 (W)")}</th>' + (f'<th>{t("Battery","电池")}</th>' if key == 'gsl' else '') + f'<th>{t("Key specs","主要参数")}</th><th>{t("Size (mm)","尺寸 (mm)")}</th><th>{t("Weight (kg)","重量 (kg)")}</th><th></th></tr>'
-            body = ''.join(f'<tr><td><b>{e(s["model"])}</b></td><td>{e(s["rated"])}</td><td>{e(s["peak"])}</td>' + (f'<td>{e(s["cap"])}</td>' if key == 'gsl' else '') + f'<td>{e(s["specs"])}</td><td>{e(s["size"])}</td><td>{e(s["weight"])}</td><td><a class="btn btn-sm btn-green" href="{wa("Hello Senrex, I am interested in " + key.upper() + " " + s["model"])}" target="_blank" rel="noopener">{t("Inquire","询价")}</a></td></tr>' for s in rows)
-        sol += f'''<div class="series" id="{key}"><img src="assets/img/solar/{key}.jpg" alt="{e(en)}" loading="lazy" data-zoom>
-<div><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><div class="tscroll"><table class="t">{hdr}{body}</table></div></div></div>'''
+        cards = ''
+        for i, x in enumerate(D['solar']):
+            if x['series'] != key: continue
+            sub = (e(x['cap']) if key == 'gbp' else f"{e(x['rated'])} W")
+            cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="assets/img/solar/{key}.jpg" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
+<div class="body"><span class="code">{key.upper()}</span><h3>{e(x['model'])}</h3><div class="meta">{t(en, zh)}</div>
+<div class="chips"><span class="chip">{sub}</span><span class="chip">{e(x['bv'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
+        sol += f'''<div class="series-head" id="{key}"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p></div><div class="grid">{cards}</div>'''
     rem = ''
     for r in D['remote']:
         ty = t('AC remote', '空调遥控器') if r['type'] == 'AC' else t('TV remote', '电视遥控器')
@@ -256,7 +275,7 @@ def page_about():
 </div></section>
 <section class="s alt"><div class="wrap">
   <div class="head"><div class="kicker">{t('Quality','品质保障')}</div><h2>{t('Inspection reports','检验检测报告')}</h2><p>{t('Our products pass national quality inspection and are insured by Ping An China.','本公司产品通过国家质量检测认证，由中国平安承保。')}</p></div>
-  <img class="certs" src="assets/img/certs.jpg" alt="Quality inspection reports" data-zoom style="max-width:1000px;margin:0 auto;cursor:zoom-in">
+  {CERTGRID_HTML}
 </div></section>
 <section class="s"><div class="wrap">
   <div class="why">
@@ -302,5 +321,7 @@ write('products.html', page_products())
 write('about.html', page_about())
 write('contact.html', page_contact())
 open(os.path.join(ROOT, 'assets', 'js', 'data.js'), 'w', encoding='utf-8').write(
-    'window.SENREX_DATA=' + json.dumps({'power': D['power'], 'battery': D['battery']}, ensure_ascii=False) + ';')
+    'window.SENREX_DATA=' + json.dumps({'power': D['power'], 'battery': D['battery'], 'solar': D['solar'],
+    'series': {k: [v[0], v[1]] for k, v in SERIES.items()}}, ensure_ascii=False) + ';\nwindow.SENREX_COUNTRIES='
+    + json.dumps(json.load(open(os.path.join(ROOT, 'data', 'countries.json'), encoding='utf-8')), ensure_ascii=False) + ';')
 print('built', TOTAL, 'models')

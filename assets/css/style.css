@@ -261,3 +261,17 @@ footer{background:linear-gradient(180deg,#0a2456,#071a40)}
 .card[data-kind="power"] .pic{padding:0;aspect-ratio:4/5;overflow:hidden}
 .card[data-kind="power"] .pic img{width:100%;height:100%;max-height:none;object-fit:cover;filter:none}
 .card[data-kind="power"] .pic::after{display:none}
+.series-head{margin:26px 0 16px;scroll-margin-top:140px}
+.series-head h3{margin:0 0 4px;color:var(--navy);font-size:20px}
+.series-head p{margin:0;color:var(--muted);font-size:14px}
+.card[data-kind="solar"] .pic{padding:0;overflow:hidden}
+.card[data-kind="solar"] .pic img{width:100%;height:100%;max-height:none;object-fit:cover;filter:none}
+.card[data-kind="solar"] .pic::after{display:none}
+.card .pic img{image-rendering:auto}
+.certgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.certgrid img{background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 10px 24px -8px rgba(13,47,110,.28);transition:transform .3s;cursor:zoom-in}
+.certgrid img:hover{transform:translateY(-6px) rotate(-.6deg)}
+.split .certgrid{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.certgrid{grid-template-columns:repeat(3,1fr)}}
+.card[data-kind="solar"] .pic{padding:8px;background:#fff}
+.card[data-kind="solar"] .pic img{object-fit:contain;height:auto;border-radius:8px}
