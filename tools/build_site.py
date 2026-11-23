@@ -31,6 +31,7 @@ CO_DEFAULT = {
     'addr_zh': '安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋',
     'addr_en': 'Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China',
     'ceo_name': 'Jack Liu', 'ceo_mobile': '+86 158 5501 5888', 'ceo_wa': '8615855015888', 'ceo_wechat': '15855015888',
+    'ceo2_name': 'Jason Liu', 'ceo2_name_zh': '刘先国', 'ceo2_mobile': '+86 131 3550 7999', 'ceo2_wa': '8613135507999',
 }
 CO = dict(CO_DEFAULT, **{k: v for k, v in SITE.get('company', {}).items() if v})
 WA_LINK = 'https://wa.me/' + CO['wa']
@@ -169,27 +170,35 @@ def foot():
 </body></html>'''
 
 def ceo_section():
-    wa_ceo = 'https://wa.me/' + CO['ceo_wa'] + '?text=' + urllib.parse.quote('Hello Jack, I am interested in Senrex energy storage products.')
-    return f'''<section class="s ceo-s"><div class="wrap">
-  <div class="ceo">
-    <div class="ceo-photo"><img src="{img('assets/img/team/jack-liu.webp')}" alt="{e(CO['ceo_name'])}, CEO" loading="lazy"></div>
+    def card(photo, name, name_zh, role, bio, wa, mobile, wechat=None):
+        wa_l = 'https://wa.me/' + wa + '?text=' + urllib.parse.quote('Hello ' + name.split()[0] + ', I am interested in Senrex products.')
+        wc = (f'''<button class="btn btn-wechat" type="button" data-wechat="{e(wechat)}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M9.2 4C5.2 4 2 6.7 2 10c0 1.9 1 3.6 2.7 4.7L4 17l2.6-1.3c.8.2 1.7.4 2.6.4h.6a5.6 5.6 0 0 1-.2-1.5c0-3.4 3.2-6.1 7.2-6.1h.5C16.6 5.9 13.2 4 9.2 4zM6.8 8.2a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zm4.8 0a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zM16.8 10c-3.4 0-6.1 2.2-6.1 5s2.7 5 6.1 5c.7 0 1.4-.1 2-.3L21 21l-.6-2c1.2-.9 2-2.3 2-3.9 0-2.9-2.6-5.1-5.6-5.1zm-2 2.9a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5zm4 0a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5z"/></svg>{t('Add on WeChat','添加微信')}</button>''' if wechat else '')
+        note = f'<p class="ceo-note">{t("WeChat ID","微信号")}: <b>{e(wechat)}</b></p>' if wechat else ''
+        zh = f' <span class="ceo-zh">{e(name_zh)}</span>' if name_zh else ''
+        return f'''<div class="ceo">
+    <div class="ceo-photo"><img src="{img(photo)}" alt="{e(name)}, CEO" loading="lazy"></div>
     <div class="ceo-info">
-      <div class="kicker">{t('Leadership','公司领导')}</div>
-      <h2>{e(CO['ceo_name'])}</h2>
-      <p class="ceo-role">{t('CEO · Energy Storage Power Supply','首席执行官 · 储能电源')}</p>
-      <p>{t('Jack leads our energy storage power supply business, from portable power stations to complete solar storage systems. Talk to him directly about projects, OEM orders and distribution.','刘总负责公司储能电源业务，涵盖便携式储能电源到完整光储系统。项目合作、OEM定制与代理经销，欢迎直接联系。')}</p>
-      <div class="ceo-btns">
-        <button class="btn btn-wechat" type="button" data-wechat="{e(CO['ceo_wechat'])}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M9.2 4C5.2 4 2 6.7 2 10c0 1.9 1 3.6 2.7 4.7L4 17l2.6-1.3c.8.2 1.7.4 2.6.4h.6a5.6 5.6 0 0 1-.2-1.5c0-3.4 3.2-6.1 7.2-6.1h.5C16.6 5.9 13.2 4 9.2 4zM6.8 8.2a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zm4.8 0a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zM16.8 10c-3.4 0-6.1 2.2-6.1 5s2.7 5 6.1 5c.7 0 1.4-.1 2-.3L21 21l-.6-2c1.2-.9 2-2.3 2-3.9 0-2.9-2.6-5.1-5.6-5.1zm-2 2.9a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5zm4 0a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5z"/></svg>{t('Add on WeChat','添加微信')}</button>
-        <a class="btn btn-wa" href="{wa_ceo}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="20" height="20" fill="currentColor"')} WhatsApp</a>
-        <a class="btn btn-call" href="tel:+{CO['ceo_wa']}">☎ {e(CO['ceo_mobile'])}</a>
-      </div>
-      <p class="ceo-note">{t('WeChat ID','微信号')}: <b>{e(CO['ceo_wechat'])}</b></p>
+      <h2>{e(name)}{zh}</h2>
+      <p class="ceo-role">{role}</p>
+      <p>{bio}</p>
+      <div class="ceo-btns">{wc}
+        <a class="btn btn-wa" href="{wa_l}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="20" height="20" fill="currentColor"')} WhatsApp</a>
+        <a class="btn btn-call" href="tel:+{wa}">☎ {e(mobile)}</a>
+      </div>{note}
     </div>
-  </div>
+  </div>'''
+    c1 = card('assets/img/team/jack-liu.webp', CO['ceo_name'], CO.get('ceo_name_zh', ''), t('CEO · Energy Storage Power Supply','首席执行官 · 储能电源'),
+              t('Leads our energy storage power supply business, from portable power stations to complete solar storage systems. Talk to him directly about projects, OEM orders and distribution.','负责储能电源业务，涵盖便携式储能电源到完整光储系统。项目合作、OEM定制与代理经销，欢迎直接联系。'),
+              CO['ceo_wa'], CO['ceo_mobile'], CO['ceo_wechat'])
+    c2 = card('assets/img/team/jason-liu.webp', CO['ceo2_name'], CO.get('ceo2_name_zh', ''), t('CEO · Remote Controls','首席执行官 · 遥控器'),
+              t('Leads our remote control business: replacement AC and TV remotes for all major brands. Contact him directly for wholesale prices, OEM and bulk orders.','负责遥控器业务，提供各大品牌空调与电视替换遥控器。批发价格、OEM定制及大批量订单，欢迎直接联系。'),
+              CO['ceo2_wa'], CO['ceo2_mobile'])
+    return f'''<section class="s ceo-s"><div class="wrap">
+  <div class="head"><div class="kicker">{t('Leadership','公司领导')}</div><h2>{t('Talk to our CEOs directly','直接联系我们的负责人')}</h2></div>
+  <div class="leaders">{c1}{c2}</div>
 </div></section>
 '''
 
-# ---------------- HOME ----------------
 def page_home():
     cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{img(im)}" alt="{e(en)}" loading="lazy"></div>
 <div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, im in CATS)
@@ -387,6 +396,6 @@ json.dump([{'key': k, 'en': v['en'], 'zh': v['zh']} for k, v in CATALOG.items()]
 json.dump({'company': CO_DEFAULT, 'images': sorted(set(
     [c[5] for c in CATS] + [f'assets/img/solar/{k}.jpg' for k in SERIES] + [f'assets/img/certs/cert{i}.jpg' for i in range(1, 6)] +
     ['assets/img/logo_mark.png', 'assets/img/logo.png', 'assets/img/qr_wechat.png', 'assets/img/qr_whatsapp.png',
-     'assets/img/solar/hero_gsl.jpg', 'assets/img/showcase/alpine-1536.webp', 'assets/img/team/jack-liu.webp']))},
+     'assets/img/solar/hero_gsl.jpg', 'assets/img/showcase/alpine-1536.webp', 'assets/img/team/jack-liu.webp', 'assets/img/team/jason-liu.webp']))},
     open(os.path.join(ROOT, 'data', 'site_defaults.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 print('built', TOTAL, 'models')
