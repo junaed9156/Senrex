@@ -324,3 +324,19 @@ footer .logo img { mix-blend-mode:multiply; }
 .float .wa.wa-name{width:auto;height:44px;padding:0 16px 0 12px;gap:8px;border-radius:999px;background:linear-gradient(180deg,#2fd472,#17a556);border:1px solid #7fe0a6;color:#fff;font-weight:800;font-size:14px;box-shadow:0 8px 20px -6px #0b3a2299}
 .float .wa.wa-name svg{width:20px;height:20px;fill:#fff}
 @media (max-width:760px){.float .wa.wa-name{height:40px;padding:0 12px 0 10px;font-size:13px}.float .wa.wa-name svg{width:18px;height:18px}}
+/* compact leadership block on desktop */
+.ceo-s{padding:46px 0 !important}
+.ceo-s .head{margin-bottom:22px}
+.ceo-s .head h2{font-size:clamp(22px,2.1vw,28px) !important;line-height:1.2}
+.ceo-s .leaders{max-width:1040px;margin:0 auto;gap:18px}
+.leaders .ceo{grid-template-columns:140px 1fr;gap:18px;padding:16px 18px;border-radius:18px}
+.leaders .ceo-photo{border-radius:14px}
+.leaders .ceo-info h2{font-size:21px;margin:0 0 2px}
+.leaders .ceo-role{font-size:14px;margin-bottom:8px}
+.leaders .ceo-info>p{font-size:13.5px;line-height:1.55;margin:0 0 4px}
+.leaders .ceo-btns{margin-top:10px;gap:8px}
+.leaders .ceo-btns .btn{padding:8px 12px;font-size:13px}
+.leaders .ceo-btns .btn svg{width:17px;height:17px}
+.leaders .ceo-note{font-size:12.5px;margin-top:8px}
+@media (max-width:760px){.leaders .ceo{grid-template-columns:1fr}.leaders .ceo-photo{max-width:220px}}
+.ceo-s .head{max-width:1040px;margin-left:auto;margin-right:auto}
