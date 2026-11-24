@@ -151,7 +151,7 @@ def foot():
     <div>
       <div class="logo"><img src="{img('assets/img/logo.png')}" alt="Senrex 赛恩力"></div>
       <p>{t(CO['en'], CO['zh'])}</p>
-      <p>{t('Lithium battery source factory · Wholesale from stock · Dropshipping · Export','锂电池源头工厂 · 现货批发 · 一件代发 · 外贸出口')}</p>
+      <p>{t('Energy storage batteries &amp; remote controls · Source factory · Wholesale from stock · Dropshipping · Export','储能电池与遥控器源头工厂 · 现货批发 · 一件代发 · 外贸出口')}</p>
     </div>
     <div>
       <h4>{t('Products','产品中心')}</h4>
@@ -222,9 +222,9 @@ def page_home():
     <img src="{img('assets/img/showcase/alpine-1536.webp')}" {'' if IMAGES.get('assets/img/showcase/alpine-1536.webp') else 'srcset="assets/img/showcase/alpine-900.webp 900w, assets/img/showcase/alpine-1536.webp 1536w"'} sizes="100vw" width="1536" height="1024" fetchpriority="high" alt="">
   </picture>
   <div class="wrap"><div class="hero-copy">
-  <span class="tag">{t('Lithium battery source factory','锂电池源头工厂')}</span>
+  <span class="tag">{t('Energy storage &amp; remote control factory','储能电池 · 遥控器 源头工厂')}</span>
   <h1>{t('Power for<br>every <em>journey.</em>','澎湃动力<br><em>随行致远。</em>')}</h1>
-  <p>{t('Portable power stations, lithium batteries and solar storage systems. Factory-direct from Tianchang, China.','便携式储能电源、动力锂电池与光储系统。安徽天长，厂家直供。')}</p>
+  <p>{t('Portable power stations, lithium battery packs, solar storage systems and replacement remote controls for all major brands. Factory-direct from Tianchang, China.','便携式储能电源、动力锂电池、光储系统，以及各大品牌替换遥控器。安徽天长，厂家直供。')}</p>
   <div class="cta">
     <a class="btn btn-green" href="products.html">{t('View products','浏览产品')}</a>
     <a class="btn btn-line" href="{wa('Hello Senrex, I would like a quotation.')}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="18" height="18" fill="currentColor"')} WhatsApp</a>
@@ -243,9 +243,9 @@ def page_home():
 <section class="s alt"><div class="wrap">
   <div class="head"><div class="kicker">{t('Why Senrex','为什么选择赛恩力')}</div><h2>{t('Factory direct, export ready','工厂直供，外贸无忧')}</h2></div>
   <div class="why">
-    <div><i>⚡</i><h3>{t('Source factory','源头工厂')}</h3><p>{t('We produce lithium batteries ourselves, so you buy at factory price.','自主生产锂电池，工厂直供价格。')}</p></div>
+    <div><i>⚡</i><h3>{t('Source factory','源头工厂')}</h3><p>{t('We make our own lithium batteries and remote controls, so you buy at factory price.','自主生产锂电池与遥控器，工厂直供价格。')}</p></div>
     <div><i>✓</i><h3>{t('Tested quality','品质检测')}</h3><p>{t('Products pass national quality inspection and are insured by Ping An China.','产品通过国家质量检测认证，由中国平安承保。')}</p></div>
-    <div><i>⚙</i><h3>{t('Full R&D system','完善研发体系')}</h3><p>{t('Core technology for high energy density and long cycle life.','掌握高能量密度、长循环寿命核心技术。')}</p></div>
+    <div><i>⚙</i><h3>{t('Full R&D system','完善研发体系')}</h3><p>{t('Long-life, high-density batteries and reliable, fully compatible remote controls.','掌握高能量密度、长循环寿命电池技术，遥控器兼容稳定、经久耐用。')}</p></div>
     <div><i>✈</i><h3>{t('Stock & export','现货与出口')}</h3><p>{t('Wholesale from stock, single-piece dropshipping and worldwide export.','现货批发，一件代发，全球出口。')}</p></div>
   </div>
 </div></section>
@@ -253,7 +253,7 @@ def page_home():
   <div>
     <div class="kicker">{t('About us','关于我们')}</div>
     <h2 style="color:var(--navy);font-size:30px;margin:6px 0 12px">{t(CO['en'], CO['zh'])}</h2>
-    <p>{t('A technology-based enterprise deeply involved in the lithium battery industry chain, located in the New Energy Industry Base of Tianchang City, Anhui Province. We produce and sell lithium batteries, photovoltaic modules and inverters, and also design and build solar power and electrical projects.','一家深耕锂电池产业链的科技型企业，坐落于安徽省天长市新能源产业基地。主营锂电池、光伏组件、逆变器等产品生产销售，同时承接光伏发电及电力工程设计施工业务。')}</p>
+    <p>{t('A technology-based enterprise in the New Energy Industry Base of Tianchang City, Anhui Province, with two main business lines: <b>energy storage</b> (lithium battery packs, portable power stations, photovoltaic modules, inverters and solar storage systems) and <b>remote controls</b> (replacement air-conditioner and TV remotes for all major brands). We also design and build solar power and electrical projects.','一家坐落于安徽省天长市新能源产业基地的科技型企业，拥有两大主营业务：<b>储能电池</b>（动力锂电池组、便携式储能电源、光伏组件、逆变器及光储系统）与<b>遥控器</b>（各大品牌空调、电视替换遥控器）。同时承接光伏发电及电力工程设计施工业务。')}</p>
     <a class="btn btn-navy" href="about.html">{t('Learn more','了解更多')}</a>
   </div>
   {CERTGRID_HTML}
@@ -336,8 +336,8 @@ def page_about():
   <div>
     <div class="kicker">{t('Company profile','公司简介')}</div>
     <h2 style="color:var(--navy);font-size:28px;margin:6px 0 14px">{t('Technology · Manufacturing · Quality','科技缔造 · 专业品质')}</h2>
-    {t('Tianchang Xianrui New Energy Technology Co., Ltd. (brand: Senrex) is a technology-based enterprise deeply involved in the lithium battery industry chain. The company is located in the New Energy Industry Base of Tianchang City, Anhui Province.', '天长市先锐新能源科技有限公司（品牌：赛恩力 Senrex）是一家深耕锂电池产业链的科技型企业，公司坐落于安徽省天长市新能源产业基地。', 'p')}
-    {t('Lithium batteries are our core business. We produce and sell photovoltaic modules, inverters and related products, and we also design and build solar power and electrical engineering projects. With a complete R&D and testing system, we master the core technologies behind high energy density and long cycle life, and our products meet strict performance requirements.', '公司以锂电池产业为核心方向，主营光伏组件、逆变器等产品生产销售，同时承接光伏发电及电力工程设计施工业务。依托完善的研发测试体系，公司掌握了支撑高能量密度、长循环寿命电池需求的核心技术，产品性能满足严苛要求。', 'p')}
+    {t('Tianchang Xianrui New Energy Technology Co., Ltd. (brand: Senrex) is a technology-based enterprise specialising in energy storage batteries and remote controls. The company is located in the New Energy Industry Base of Tianchang City, Anhui Province.', '天长市先锐新能源科技有限公司（品牌：赛恩力 Senrex）是一家专注于储能电池与遥控器的科技型企业，公司坐落于安徽省天长市新能源产业基地。', 'p')}
+    {t('Energy storage is our core business: lithium battery packs, portable power stations, photovoltaic modules, inverters and complete solar storage systems, together with solar power and electrical engineering projects. Our second business line is remote controls: hundreds of replacement air-conditioner and TV remote models for all major brands, available for wholesale, OEM and bulk orders. With a complete R&D and testing system, we master the core technologies behind high energy density and long cycle life, and every product meets strict performance requirements.', '公司以储能电池为核心业务，涵盖动力锂电池组、便携式储能电源、光伏组件、逆变器及完整光储系统，并承接光伏发电及电力工程设计施工业务。遥控器是公司另一大主营业务，提供各大品牌空调、电视替换遥控器，型号达数百款，支持批发、OEM定制及大批量订单。依托完善的研发测试体系，公司掌握了高能量密度、长循环寿命电池的核心技术，每件产品均满足严苛的性能要求。', 'p')}
     {t("As an important participant in Tianchang's 10-billion-yuan new energy vehicle parts industrial base, Xianrui New Energy is part of the local new energy industrial cluster. We stay technology-driven and quality-first, and aim to become an influential company in the regional new energy field.", '作为天长市百亿新能源汽车零部件产业基地的重要参与者，先锐新能源积极融入本地新能源产业集群，借助完善的协作配套与产业政策优势，持续提升自主创新能力。未来，公司将继续坚持科技驱动、质量为本，致力于成为区域新能源领域具有较强影响力的企业。', 'p')}
   </div>
   <img src="{img('assets/img/solar/hero_gsl.jpg')}" alt="Senrex solar storage systems" style="border-radius:14px">
@@ -351,7 +351,7 @@ def page_about():
     <div><i>①</i><h3>{t('Reliable quality','可靠的质量')}</h3><p>{t('Every product is tested before shipping.','每件产品出厂前均经检测。')}</p></div>
     <div><i>②</i><h3>{t('Timely delivery','及时的供货')}</h3><p>{t('Stock available for fast wholesale and dropshipping.','现货充足，批发与一件代发快速发货。')}</p></div>
     <div><i>③</i><h3>{t('Superior service','最佳的服务')}</h3><p>{t('One-to-one support by WhatsApp, WeChat and email.','WhatsApp、微信、邮箱一对一服务。')}</p></div>
-    <div><i>④</i><h3>{t('Full solutions','整体方案')}</h3><p>{t('From battery cells to complete solar storage systems.','从电池到完整光储系统。')}</p></div>
+    <div><i>④</i><h3>{t('Full solutions','整体方案')}</h3><p>{t('From batteries and solar storage systems to remote controls for every major brand.','从电池、光储系统到各大品牌遥控器，一站式供应。')}</p></div>
   </div>
 </div></section>
 ''' + foot()
