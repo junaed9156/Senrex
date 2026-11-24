@@ -90,7 +90,10 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
 <body data-page="{page}">
 <div class="top"><div class="wrap">
   <a href="tel:{CO['tel_link']}">☎ {CO['tel']}</a>
-  <a href="{WA_LINK}" target="_blank" rel="noopener">WhatsApp {CO['mobile']}</a>
+  <a href="https://wa.me/{CO['ceo_wa']}" target="_blank" rel="noopener">WhatsApp {e(CO['ceo_name'].split()[0])} {CO['ceo_mobile']}</a>
+  <a href="https://wa.me/{CO['ceo2_wa']}" target="_blank" rel="noopener">WhatsApp {e(CO['ceo2_name'].split()[0])} {CO['ceo2_mobile']}</a>
+  <a href="mailto:{CO['ceo_email']}">✉ {CO['ceo_email']}</a>
+  <a href="mailto:{CO['ceo2_email']}">✉ {CO['ceo2_email']}</a>
   <a href="mailto:{CO['email']}">✉ {CO['email']}</a>
 </div></div>
 <header class="nav"><div class="wrap">
