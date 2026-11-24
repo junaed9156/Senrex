@@ -341,3 +341,6 @@ footer .logo img { mix-blend-mode:multiply; }
 .leaders .ceo-note{font-size:12.5px;margin-top:8px}
 @media (max-width:760px){.leaders .ceo{grid-template-columns:1fr}.leaders .ceo-photo{max-width:220px}}
 .ceo-s .head{max-width:1040px;margin-left:auto;margin-right:auto}
+.inq .msg[data-state="ok"] { color:#1f7a3a; font-weight:700; }
+.inq .msg[data-state="sending"] { color:#4a5a70; }
+.inq [type=submit]:disabled { opacity:.6; cursor:wait; }

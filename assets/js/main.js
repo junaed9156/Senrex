@@ -176,12 +176,13 @@
     });
   });
 
-  /* Prepare a draft addressed directly to the sales team in the visitor's mail app. */
+  /* Send the inquiry straight to the sales mailbox (FormSubmit). If that fails, fall back to a draft in the visitor's mail app. */
   document.querySelectorAll('form.inq').forEach(function (form) {
     form.addEventListener('submit', function (event) {
       event.preventDefault();
       if (form.elements._honey.value) return;
       var status = form.querySelector('.msg');
+      var btn = form.querySelector('[type=submit]');
       var missing = ['name', 'email', 'message'].map(function (key) { return form.elements[key]; })
         .find(function (field) { return !field.value.trim(); });
       if (missing || !form.elements.email.validity.valid) {
@@ -194,15 +195,37 @@
       }
       var labels = {name: 'Name', email: 'Email', company: 'Company', phone: 'Mobile / WhatsApp',
         country: 'Country', quantity: 'Order quantity', product_line: 'Product line', product: 'Model'};
-      var lines = Object.keys(labels).filter(function (key) { return form.elements[key].value.trim(); })
-        .map(function (key) { return labels[key] + ': ' + form.elements[key].value.trim(); });
+      var data = {};
+      Object.keys(labels).forEach(function (key) { var v = form.elements[key].value.trim(); if (v) data[labels[key]] = v; });
+      var lines = Object.keys(data).map(function (k) { return k + ': ' + data[k]; });
       var subject = 'Senrex quotation — ' + (form.elements.product.value || form.elements.product_line.value || form.elements.name.value);
-      var body = lines.join('\n') + '\n\n' + form.elements.message.value.trim();
-      var draft = 'mailto:' + CFG.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      status.dataset.state = 'draft';
-      status.textContent = (isZh() ? '在邮件应用中确认并发送。若未打开，请发邮件至 ' :
-        'Review and send in your email app. If it didn’t open, email ') + CFG.email + '.';
-      window.location.href = draft;
+      var message = form.elements.message.value.trim();
+      function draft() {
+        var body = lines.join('\n') + '\n\n' + message;
+        status.dataset.state = 'draft';
+        status.textContent = (isZh() ? '在邮件应用中确认并发送。若未打开，请发邮件至 ' :
+          'Review and send in your email app. If it didn’t open, email ') + CFG.email + '.';
+        window.location.href = 'mailto:' + CFG.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      }
+      var payload = Object.assign({}, data, {
+        Message: message, Page: location.href,
+        _subject: subject, _replyto: form.elements.email.value.trim(), _template: 'table', _captcha: 'false', _honey: ''
+      });
+      status.dataset.state = 'sending';
+      status.textContent = isZh() ? '正在发送…' : 'Sending…';
+      if (btn) btn.disabled = true;
+      fetch('https://formsubmit.co/ajax/' + encodeURIComponent(CFG.email), {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload)
+      }).then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (res) {
+          if (btn) btn.disabled = false;
+          if (String(res.success) === 'true') {
+            status.dataset.state = 'ok';
+            status.textContent = isZh() ? '✓ 询价已发送！我们会尽快与您联系。' : '✓ Inquiry sent! We will contact you soon.';
+            form.reset();
+          } else { draft(); }
+        })
+        .catch(function () { if (btn) btn.disabled = false; draft(); });
     });
   });
 
