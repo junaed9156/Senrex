@@ -30,8 +30,8 @@ CO_DEFAULT = {
     'email': '834645912@qq.com', 'web': 'www.senrex.cc',
     'addr_zh': '安徽省天长市经济开发区经十三路天盛智谷产业园A1-4栋',
     'addr_en': 'Building A1-4, Tiansheng Zhigu Industrial Park, Jing 13th Road, Economic Development Zone, Tianchang City, Anhui Province, China',
-    'ceo_name': 'Jack Liu', 'ceo_mobile': '+86 158 5501 5888', 'ceo_wa': '8615855015888', 'ceo_wechat': '15855015888',
-    'ceo2_name': 'Jason Liu', 'ceo2_name_zh': '刘先国', 'ceo2_mobile': '+86 131 3550 7999', 'ceo2_wa': '8613135507999', 'ceo2_wechat': '13135507999',
+    'ceo_name': 'Jack Liu', 'ceo_mobile': '+86 158 5501 5888', 'ceo_wa': '8615855015888', 'ceo_wechat': '15855015888', 'ceo_email': 'Jack@senrex.cc',
+    'ceo2_name': 'Jason Liu', 'ceo2_name_zh': '刘先国', 'ceo2_mobile': '+86 131 3550 7999', 'ceo2_wa': '8613135507999', 'ceo2_wechat': '13135507999', 'ceo2_email': 'Jason@senrex.cc',
 }
 CO = dict(CO_DEFAULT, **{k: v for k, v in SITE.get('company', {}).items() if v})
 WA_LINK = 'https://wa.me/' + CO['wa']
@@ -180,29 +180,30 @@ def foot():
 </body></html>'''
 
 def ceo_section():
-    def card(photo, name, name_zh, role, bio, wa, mobile, wechat=None):
+    def card(photo, name, name_zh, role, bio, wa, mobile, wechat=None, email=None):
         wa_l = 'https://wa.me/' + wa + '?text=' + urllib.parse.quote('Hello ' + name.split()[0] + ', I am interested in Senrex products.')
         wc = (f'''<button class="btn btn-wechat" type="button" data-wechat="{e(wechat)}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M9.2 4C5.2 4 2 6.7 2 10c0 1.9 1 3.6 2.7 4.7L4 17l2.6-1.3c.8.2 1.7.4 2.6.4h.6a5.6 5.6 0 0 1-.2-1.5c0-3.4 3.2-6.1 7.2-6.1h.5C16.6 5.9 13.2 4 9.2 4zM6.8 8.2a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zm4.8 0a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zM16.8 10c-3.4 0-6.1 2.2-6.1 5s2.7 5 6.1 5c.7 0 1.4-.1 2-.3L21 21l-.6-2c1.2-.9 2-2.3 2-3.9 0-2.9-2.6-5.1-5.6-5.1zm-2 2.9a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5zm4 0a.8.8 0 1 1 0 1.5.8.8 0 0 1 0-1.5z"/></svg>{t('Add on WeChat','添加微信')}</button>''' if wechat else '')
         note = f'<p class="ceo-note">{t("WeChat ID","微信号")}: <b>{e(wechat)}</b></p>' if wechat else ''
         zh = f' <span class="ceo-zh">{e(name_zh)}</span>' if name_zh else ''
+        em = (f'''<a class="btn btn-mail" href="mailto:{e(email)}?subject={urllib.parse.quote('Senrex inquiry')}">✉ {e(email)}</a>''' if email else '')
         return f'''<div class="ceo">
     <div class="ceo-photo"><img src="{img(photo)}" alt="{e(name)}, CEO" loading="lazy"></div>
     <div class="ceo-info">
       <h2>{e(name)}{zh}</h2>
       <p class="ceo-role">{role}</p>
       <p>{bio}</p>
-      <div class="ceo-btns">{wc}
-        <a class="btn btn-wa" href="{wa_l}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="20" height="20" fill="currentColor"')} WhatsApp</a>
+      <div class="ceo-btns">
+        <a class="btn btn-wa" href="{wa_l}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="20" height="20" fill="currentColor"')} WhatsApp</a>{wc}{em}
         <a class="btn btn-call" href="tel:+{wa}">☎ {e(mobile)}</a>
       </div>{note}
     </div>
   </div>'''
     c1 = card('assets/img/team/jack-liu.webp', CO['ceo_name'], CO.get('ceo_name_zh', ''), t('CEO · Energy Storage Power Supply','首席执行官 · 储能电源'),
               t('Leads our energy storage power supply business, from portable power stations to complete solar storage systems. Talk to him directly about projects, OEM orders and distribution.','负责储能电源业务，涵盖便携式储能电源到完整光储系统。项目合作、OEM定制与代理经销，欢迎直接联系。'),
-              CO['ceo_wa'], CO['ceo_mobile'], CO['ceo_wechat'])
+              CO['ceo_wa'], CO['ceo_mobile'], CO['ceo_wechat'], CO.get('ceo_email'))
     c2 = card('assets/img/team/jason-liu.webp', CO['ceo2_name'], CO.get('ceo2_name_zh', ''), t('CEO · Remote Controls','首席执行官 · 遥控器'),
               t('Leads our remote control business: replacement AC and TV remotes for all major brands. Contact him directly for wholesale prices, OEM and bulk orders.','负责遥控器业务，提供各大品牌空调与电视替换遥控器。批发价格、OEM定制及大批量订单，欢迎直接联系。'),
-              CO['ceo2_wa'], CO['ceo2_mobile'], CO.get('ceo2_wechat'))
+              CO['ceo2_wa'], CO['ceo2_mobile'], CO.get('ceo2_wechat'), CO.get('ceo2_email'))
     return f'''<section class="s ceo-s"><div class="wrap">
   <div class="head"><div class="kicker">{t('Leadership','公司领导')}</div><h2>{t('Talk to our CEOs directly','直接联系我们的负责人')}</h2></div>
   <div class="leaders">{c1}{c2}</div>

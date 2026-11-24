@@ -16,11 +16,13 @@
   "ceo_mobile": "+86 158 5501 5888",
   "ceo_wa": "8615855015888",
   "ceo_wechat": "15855015888",
+  "ceo_email": "Jack@senrex.cc",
   "ceo2_name": "Jason Liu",
   "ceo2_name_zh": "刘先国",
   "ceo2_mobile": "+86 131 3550 7999",
   "ceo2_wa": "8613135507999",
-  "ceo2_wechat": "13135507999"
+  "ceo2_wechat": "13135507999",
+  "ceo2_email": "Jason@senrex.cc"
  },
  "images": [
   "assets/img/certs/cert1.jpg",
