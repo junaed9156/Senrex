@@ -83,6 +83,8 @@ table.tx textarea{min-height:44px}
     <h1>Website Admin · 网站管理</h1>
     <p class="sub" id="loginSub">Log in to edit products, photos and texts<br>登录以编辑产品、图片和文字</p>
     <form id="loginForm">
+      <label>Username · 用户名</label>
+      <input type="text" id="un" autocomplete="username" autocapitalize="off" spellcheck="false" required>
       <label>Admin password · 管理密码</label>
       <input type="password" id="pw" autocomplete="current-password" required>
       <button class="btn full" type="submit">Log in · 登录</button>
@@ -93,6 +95,8 @@ table.tx textarea{min-height:44px}
       <div class="help">Create once at github.com → Settings → Developer settings → Fine-grained tokens:
         <ol><li>Repository access: only <b>junaed9156/Senrex</b></li><li>Permissions → Contents: <b>Read and write</b></li><li>Generate, copy and paste it here</li></ol>
         The token is stored only in encrypted form, locked by your admin password.</div>
+      <label>Username · 用户名</label>
+      <input type="text" id="un1" autocomplete="username" autocapitalize="off" spellcheck="false" required value="senrex">
       <label>New admin password · 设置管理密码</label>
       <input type="password" id="pw1" autocomplete="new-password" minlength="10" required>
       <label>Repeat password · 再次输入</label>
@@ -123,12 +127,12 @@ table.tx textarea{min-height:44px}
       <button data-tab="remote">Remotes · 遥控器</button>
       <button data-tab="texts">Texts EN/中文 · 网站文字</button>
       <button data-tab="company">Company & photos · 公司与图片</button>
-      <button data-tab="settings">Password · 密码</button>
+      <button data-tab="settings">Login · 账号密码</button>
     </nav>
   </header>
   <main id="main"></main>
 </div>
 
-<script src="assets/js/admin.js"></script>
+<script src="assets/js/admin.js?v=user1"></script>
 </body>
 </html>

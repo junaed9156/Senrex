@@ -27,6 +27,10 @@
     var ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, await keyFrom(pw, salt), new TextEncoder().encode(tok));
     return { v: 1, kdf: 'PBKDF2-SHA256-310000', salt: b64(salt), iv: b64(iv), ct: b64(ct) };
   }
+  async function userHash(u) {
+    var d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('senrex-admin:' + String(u || '').trim().toLowerCase()));
+    return b64(d);
+  }
   async function decryptToken(blob, pw) {
     var pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(blob.iv) }, await keyFrom(pw, unb64(blob.salt)), unb64(blob.ct));
     return new TextDecoder().decode(pt);
@@ -77,21 +81,24 @@
   $('#resetLink').addEventListener('click', function (e) { e.preventDefault(); showSetup(true); });
   $('#loginForm').addEventListener('submit', async function (e) {
     e.preventDefault(); var m = $('#loginMsg'); setMsg(m, 'Checking… 验证中…');
+    var bad = 'Wrong username or password · 用户名或密码错误';
+    if (adminBlob && adminBlob.user && adminBlob.user !== await userHash($('#un').value)) { token = null; setMsg(m, bad, 'err'); return; }
     try { token = await decryptToken(adminBlob, $('#pw').value); }
-    catch (err) { token = null; setMsg(m, 'Wrong password · 密码错误', 'err'); return; }
+    catch (err) { token = null; setMsg(m, bad, 'err'); return; }
     try { await gh(''); } catch (err) { token = null; setMsg(m, 'The saved GitHub token no longer works (' + err.message + '). Use "Set up again". 令牌失效，请重新设置。', 'err'); return; }
     try { sessionStorage.setItem('senrex-admin', token); } catch (e2) {}
     startApp();
   });
   $('#setupForm').addEventListener('submit', async function (e) {
     e.preventDefault(); var m = $('#loginMsg');
-    var tok = $('#tok').value.trim(), p1 = $('#pw1').value, p2 = $('#pw2').value;
+    var tok = $('#tok').value.trim(), p1 = $('#pw1').value, p2 = $('#pw2').value, u1 = $('#un1').value.trim();
+    if (u1.length < 3) return setMsg(m, 'Username must be at least 3 characters · 用户名至少3位', 'err');
     if (p1 !== p2) return setMsg(m, 'Passwords do not match · 两次密码不一致', 'err');
     if (p1.length < 10) return setMsg(m, 'Password must be at least 10 characters · 密码至少10位', 'err');
     token = tok; setMsg(m, 'Checking token… 验证令牌…');
     try { await gh(''); } catch (err) { token = null; return setMsg(m, 'Token does not work: ' + err.message, 'err'); }
     try {
-      var blob = await encryptToken(tok, p1);
+      var blob = await encryptToken(tok, p1); blob.user = await userHash(u1);
       var cur = await gh('/contents/data/admin.json?ref=' + BRANCH, { allow404: true });
       await putFile('data/admin.json', utf8b64(JSON.stringify(blob, null, 1)), 'Admin: set password', cur && cur.sha);
       adminBlob = blob;
@@ -353,18 +360,22 @@
 
   function renderSettings() {
     var main = $('#main'); main.innerHTML = '';
-    var box = el('div', { class: 'box' }, '<h3>Change admin password · 修改管理密码</h3>' +
-      '<label>New password · 新密码</label><input type="password" id="np1" minlength="10"><label>Repeat · 再次输入</label><input type="password" id="np2" minlength="10">' +
-      '<button class="btn" id="npBtn" style="margin-top:12px">Change password · 修改密码</button><div class="msg" id="npMsg"></div>');
+    var box = el('div', { class: 'box' }, '<h3>Change username &amp; password · 修改用户名和密码</h3>' +
+      '<label>New username · 新用户名</label><input type="text" id="nu" autocapitalize="off" spellcheck="false" autocomplete="username">' +
+      '<label>New password · 新密码</label><input type="password" id="np1" minlength="10" autocomplete="new-password"><label>Repeat · 再次输入</label><input type="password" id="np2" minlength="10" autocomplete="new-password">' +
+      '<div class="help">Both are needed to log in. 登录时需要用户名和密码。</div>' +
+      '<button class="btn" id="npBtn" style="margin-top:12px">Save · 保存</button><div class="msg" id="npMsg"></div>');
     main.appendChild(box);
     $('#npBtn').onclick = async function () {
-      var a = $('#np1').value, b = $('#np2').value, m = $('#npMsg');
+      var u = $('#nu').value.trim(), a = $('#np1').value, b = $('#np2').value, m = $('#npMsg');
+      if (u.length < 3) return setMsg(m, 'Username: at least 3 characters · 用户名至少3位', 'err');
       if (a !== b) return setMsg(m, 'Passwords do not match · 两次密码不一致', 'err');
       if (a.length < 10) return setMsg(m, 'At least 10 characters · 至少10位', 'err');
       try {
-        var blob = await encryptToken(token, a), cur = await gh('/contents/data/admin.json?ref=' + BRANCH, { allow404: true });
-        await putFile('data/admin.json', utf8b64(JSON.stringify(blob, null, 1)), 'Admin: change password', cur && cur.sha);
-        setMsg(m, 'Password changed · 密码已修改', 'ok');
+        var blob = await encryptToken(token, a); blob.user = await userHash(u);
+        var cur = await gh('/contents/data/admin.json?ref=' + BRANCH, { allow404: true });
+        await putFile('data/admin.json', utf8b64(JSON.stringify(blob, null, 1)), 'Admin: change login', cur && cur.sha);
+        adminBlob = blob; setMsg(m, 'Saved · 已保存', 'ok');
       } catch (err) { setMsg(m, 'Failed: ' + err.message, 'err'); }
     };
   }
