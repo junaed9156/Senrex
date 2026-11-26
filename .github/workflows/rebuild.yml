@@ -27,7 +27,7 @@ jobs:
         run: |
           git config user.name "senrex-site-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A index.html products.html about.html contact.html assets/js/data.js data/texts_catalog.json data/site_defaults.json
+          git add -A index.html products.html about.html contact.html assets/js/data.js data/texts_catalog.json data/site_defaults.json assets/img/thumbs
           if git diff --cached --quiet; then echo "nothing to update"; exit 0; fi
           git commit -m "Rebuild pages from admin edits"
           git pull --rebase origin main

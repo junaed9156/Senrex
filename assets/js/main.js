@@ -83,7 +83,7 @@
   document.querySelectorAll('[data-zoom]').forEach(function (img) {
     img.style.cursor = 'zoom-in';
     img.addEventListener('click', function () {
-      var z = document.getElementById('zmodal'); z.querySelector('img').src = img.src; z.querySelector('img').alt = img.alt; open('zmodal');
+      var z = document.getElementById('zmodal'); z.querySelector('img').src = img.dataset.full || img.src; z.querySelector('img').alt = img.alt; open('zmodal');
     });
   });
 

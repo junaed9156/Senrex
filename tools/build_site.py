@@ -21,6 +21,30 @@ def img(path):
 def pimg(kind, f):
     return f if '/' in f else f'assets/img/{kind}/{f}'
 
+def thumb(src, width=480):
+    """Small copy of a product photo for the list pages (the full photo still opens in the pop-up)."""
+    full = os.path.join(ROOT, src)
+    if not os.path.exists(full) or not src.startswith('assets/img/'):
+        return src
+    out_rel = 'assets/img/thumbs/' + src[len('assets/img/'):]
+    out = os.path.join(ROOT, out_rel)
+    try:
+        if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(full):
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            im = Image.open(full)
+            im.thumbnail((width, width * 2), Image.LANCZOS)
+            if src.lower().endswith(('.jpg', '.jpeg')):
+                im.convert('RGB').save(out, 'JPEG', quality=78, optimize=True, progressive=True)
+            elif src.lower().endswith('.webp'):
+                im.save(out, 'WEBP', quality=80, method=6)
+            elif src.lower().endswith('.png'):
+                im.save(out, 'PNG', optimize=True)
+            else:
+                return src
+        return out_rel if os.path.getsize(out) < os.path.getsize(full) else src
+    except Exception:
+        return src
+
 CO_DEFAULT = {
     'en': 'Tianchang Xianrui New Energy Technology Co., Ltd.',
     'zh': '天长市先锐新能源科技有限公司',
@@ -43,7 +67,7 @@ def _ver(*paths):
         except Exception: pass
     return h.hexdigest()[:8]
 VER = _ver('assets/css/style.css', 'assets/css/alpine.css', 'assets/js/main.js', 'data/products.json', 'data/site.json')
-CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="{img(f"assets/img/certs/cert{i}.jpg")}" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
+CERTGRID_HTML = '<div class="certgrid">' + ''.join(f'<img src="{thumb(img(f"assets/img/certs/cert{i}.jpg"))}" data-full="{img(f"assets/img/certs/cert{i}.jpg")}" alt="Inspection report {i}" loading="lazy" data-zoom>' for i in range(1, 6)) + '</div>'
 
 def e(s):
     return html.escape(str(s))
@@ -55,8 +79,12 @@ def t(en, zh, tag='span'):
     en, zh = o.get('en') or en, o.get('zh') or zh
     return f'<{tag} class="en">{en}</{tag}><{tag} class="zh">{zh}</{tag}>'
 
-def wa(text):
-    return WA_LINK + '?text=' + urllib.parse.quote(text)
+def wa(text, number=None):
+    return 'https://wa.me/' + (number or CO['wa']) + '?text=' + urllib.parse.quote(text)
+
+def wa_remote(text):
+    # Remote control inquiries go to the remote control business (Jason Liu)
+    return wa(text, CO['ceo2_wa'])
 
 WA_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>'
 MAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.4 7 12 11.4 18.6 7H5.4z"/></svg>'
@@ -149,7 +177,7 @@ def foot():
 <footer><div class="wrap">
   <div class="cols">
     <div>
-      <div class="logo"><img src="{img('assets/img/logo.png')}" alt="Senrex 赛恩力"></div>
+      <div class="logo"><img src="{thumb(img('assets/img/logo.png'), 240)}" alt="Senrex 赛恩力"></div>
       <p>{t(CO['en'], CO['zh'])}</p>
       <p>{t('Energy storage batteries &amp; remote controls · Source factory · Wholesale from stock · Dropshipping · Export','储能电池与遥控器源头工厂 · 现货批发 · 一件代发 · 外贸出口')}</p>
     </div>
@@ -214,7 +242,7 @@ def ceo_section():
 '''
 
 def page_home():
-    cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{img(im)}" alt="{e(en)}" loading="lazy"></div>
+    cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{thumb(img(im), 640)}" alt="{e(en)}" loading="lazy"></div>
 <div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, im in CATS)
     return head('Lithium Battery Factory', 'home') + f'''
 <section class="hero alpine">
@@ -289,7 +317,7 @@ def page_products():
             _w, _h = 1, 1
         fit = ' fit' if _w / _h > 0.8 else ''
         name = t(p['name_en'], p.get('name_zh') or p['name_en']) if p.get('name_en') else t('Portable Power Station','便携式储能电源')
-        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic{fit}"><img src="{src}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
+        pcards += f'''<div class="card" data-kind="power" data-id="{p['id']}"><div class="pic{fit}"><img src="{thumb(src)}" alt="Portable power station {e(p['power'])}" loading="lazy"></div>
 <div class="body"><span class="code">{p['id']}</span><h3>{name}</h3><div class="meta">{e(p['power'])}</div>
 <div class="chips"><span class="chip">{e(p['capacity'][:40])}</span><span class="chip">{e(p['battery'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     bcards = ''
@@ -297,7 +325,7 @@ def page_products():
         chem = 'NMC' + (' · LiFePO4' if b['lfp'][0] != '—' else '')
         b['wh'] = int(float(b['v']) * float(b['ah']))
         name = t(b['name_en'], b.get('name_zh') or b['name_en']) if b.get('name_en') else f"{b['v']}V {b['ah']}Ah {t('Lithium Battery','锂电池组')}"
-        bcards += f'''<div class="card" data-kind="battery" data-id="{b['id']}"><div class="pic"><img src="{pimg('battery', b['img'])}" alt="{b['v']}V {b['ah']}Ah lithium battery pack" loading="lazy"></div>
+        bcards += f'''<div class="card" data-kind="battery" data-id="{b['id']}"><div class="pic"><img src="{thumb(pimg('battery', b['img']))}" alt="{b['v']}V {b['ah']}Ah lithium battery pack" loading="lazy"></div>
 <div class="body"><span class="code">{b['id']}</span><h3>{name}</h3><div class="meta">{b['wh']:,} Wh</div>
 <div class="chips"><span class="chip">{chem}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
     sol = ''
@@ -312,7 +340,7 @@ def page_products():
                 chip2 = f'<span class="chip">{t("Waterproof", "防水防泼溅")}</span>'
             simg = pimg('solar', x['img']) if x.get('img') else img(f'assets/img/solar/{key}.jpg')
             x['_img'] = simg
-            cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="{simg}" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
+            cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="{thumb(simg)}" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
 <div class="body"><span class="code">{key.upper()}</span><h3>{t(x['name_en'], x.get('name_zh') or x['name_en']) if x.get('name_en') else e(x['model'])}</h3><div class="meta">{t(en, zh)}</div>
 <div class="chips"><span class="chip">{sub}</span>{chip2}</div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
         if not cards: continue
@@ -320,8 +348,8 @@ def page_products():
     rem = ''
     for r in D['remote']:
         ty = t('AC remote', '空调遥控器') if r['type'] == 'AC' else t('TV remote', '电视遥控器')
-        models = ''.join(f'<a href="{wa("Hello Senrex, I am interested in remote control " + m + " (" + r["brand"] + ")")}" target="_blank" rel="noopener">{e(m)}</a>' for m in r['models'])
-        rem += f'''<div class="rem"><img src="{pimg('remote', r['img'])}" alt="{e(r['brand'])} {r['type']} remote controls" loading="lazy" data-zoom>
+        models = ''.join(f'<a href="{wa_remote("Hello " + CO["ceo2_name"].split()[0] + ", I am interested in remote control " + m + " (" + r["brand"] + "). Please send me the price.")}" target="_blank" rel="noopener">{e(m)}</a>' for m in r['models'])
+        rem += f'''<div class="rem"><img src="{thumb(pimg('remote', r['img']), 480)}" data-full="{pimg('remote', r['img'])}" alt="{e(r['brand'])} {r['type']} remote controls" loading="lazy" data-zoom>
 <div class="body"><h3>{t(r['brand'], r.get('brand_zh') or r['brand'])}<span class="ty">{ty}</span></h3><div class="models">{models}</div></div></div>'''
     return head('Products', 'products') + f'''
 <div class="ptitle"><div class="wrap"><h1>{t('Products','产品中心')}</h1><p>{TOTAL} {t('models across 4 product lines. Click any product for full specifications.','个型号，4大产品线。点击产品查看完整参数。')}</p></div></div>
@@ -330,7 +358,9 @@ def page_products():
   <div class="group" id="power"><h2>{t('Portable Power Stations','便携式储能电源')}</h2><p class="sub">{t('150W to 11,000W · NMC and LiFePO4 · AC, USB, Type-C and solar input','150W–11000W · 三元锂 / 磷酸铁锂 · AC、USB、Type-C 输出，支持太阳能充电')}</p><div class="grid">{pcards}</div></div>
   <div class="group" id="battery"><h2>{t('Lithium Battery Packs','动力锂电池组')}</h2><p class="sub">{t('48V, 60V and 72V · 12Ah to 230Ah · each model available in NMC (ternary) and LiFePO4','48V / 60V / 72V · 12Ah–230Ah · 每款均有三元锂与磷酸铁锂两种')}</p><div class="grid">{bcards}</div></div>
   <div class="group" id="solar"><h2>{t('Solar Storage & Inverters','光储一体机与逆变器')}</h2><p class="sub">{t('Complete solar energy storage for homes and businesses, plus portable folding solar panels','户用及工商业光伏储能整体方案，以及便携式折叠太阳能板')}</p>{sol}</div>
-  <div class="group" id="remote"><h2>{t('Remote Controls','遥控器')}</h2><p class="sub">{t('Replacement AC and TV remotes · tap a model number to ask on WhatsApp','空调与电视替换遥控器 · 点击型号即可通过 WhatsApp 询价')}</p><div class="remotes">{rem}</div></div>
+  <div class="group" id="remote"><h2>{t('Remote Controls','遥控器')}</h2><p class="sub">{t('Replacement AC and TV remotes · tap a model number to ask on WhatsApp','空调与电视替换遥控器 · 点击型号即可通过 WhatsApp 询价')}</p>
+  <div class="remote-contact" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 22px"><span style="font-weight:700">{t('Remote control sales','遥控器销售')}: {e(CO['ceo2_name'])}{(' ' + e(CO['ceo2_name_zh'])) if CO.get('ceo2_name_zh') else ''}</span><a class="btn btn-wa" href="{wa_remote('Hello ' + CO['ceo2_name'].split()[0] + ', I would like the price of your remote controls.')}" target="_blank" rel="noopener">{WA_SVG.replace('<svg','<svg width="20" height="20" fill="currentColor"')} WhatsApp {CO['ceo2_mobile']}</a></div>
+  <div class="remotes">{rem}</div></div>
 </div>
 ''' + foot()
 
