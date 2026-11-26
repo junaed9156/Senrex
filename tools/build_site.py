@@ -14,6 +14,9 @@ SITE = json.load(open(_site_path, encoding='utf-8')) if os.path.exists(_site_pat
 TEXTS = SITE.get('texts', {})      # {english default: {"en": ..., "zh": ...}} edited in admin
 IMAGES = SITE.get('images', {})    # {default path: new path} edited in admin
 CATALOG = {}                       # every bilingual text used, written for the admin page
+_news_path = os.path.join(ROOT, 'data', 'news.json')
+NEWS = (json.load(open(_news_path, encoding='utf-8')) if os.path.exists(_news_path) else {}).get('posts', [])
+NEWS = sorted([n for n in NEWS if not n.get('hidden')], key=lambda n: n.get('date', ''), reverse=True)
 
 def img(path):
     return IMAGES.get(path) or path
@@ -129,6 +132,7 @@ def head(title_en, page, desc='Senrex lithium battery factory: portable power st
   <nav class="menu" id="menu">
     <a href="index.html" data-p="home">{t('Home','首页')}</a>
     <a href="products.html" data-p="products">{t('Products','产品中心')}</a>
+    <a href="news.html" data-p="news">{t('News','新闻动态')}</a>
     <a href="about.html" data-p="about">{t('About Us','关于我们')}</a>
     <a href="contact.html" data-p="contact">{t('Contact','联系我们')}</a>
     <div class="lang"><button data-l="en">EN</button><button data-l="zh-CN">中文</button></div>
@@ -241,6 +245,66 @@ def ceo_section():
 </div></section>
 '''
 
+# ---------------- NEWS ----------------
+def bi(en, zh, tag='span'):
+    """Bilingual text written by the admin (not part of the fixed site texts)."""
+    en, zh = (en or '').strip(), (zh or '').strip()
+    en, zh = e(en or zh), e(zh or en)
+    if tag == 'p':
+        en = ''.join(f'<p class="en">{x}</p>' for x in en.split('\n') if x.strip())
+        zh = ''.join(f'<p class="zh">{x}</p>' for x in zh.split('\n') if x.strip())
+        return en + zh
+    return f'<{tag} class="en">{en}</{tag}><{tag} class="zh">{zh}</{tag}>'
+
+def news_media(m, small=False):
+    src = m.get('src', '')
+    if not src:
+        return ''
+    if m.get('type') == 'video':
+        return f'<video src="{e(src)}#t=0.1" controls playsinline preload="metadata"></video>'
+    return f'<img src="{thumb(src, 480 if small else 900)}" data-full="{e(src)}" alt="" loading="lazy" data-zoom>'
+
+def news_date(d):
+    try:
+        y, mth, day = d.split('-')
+        return f'<time datetime="{e(d)}">{t_plain(int(y), int(mth), int(day))}</time>'
+    except Exception:
+        return f'<time>{e(d)}</time>'
+
+def t_plain(y, m, d):
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    return f'<span class="en">{d} {months[m - 1]} {y}</span><span class="zh">{y}年{m}月{d}日</span>'
+
+def news_post(n, idx, short=False):
+    media = [m for m in n.get('media', []) if m.get('src')]
+    if short:
+        media = media[:1]
+    gal = ''.join(news_media(m, short) for m in media)
+    cls = 'media one' if len(media) == 1 else 'media'
+    body = n.get('body_en') or n.get('body_zh')
+    text = bi(n.get('body_en'), n.get('body_zh'), 'p') if body else ''
+    if short:
+        return f'''<a class="post short" href="news.html#post-{idx}">{f'<div class="{cls}">{gal}</div>' if gal else ''}<div class="post-txt">{news_date(n.get('date', ''))}<h3>{bi(n.get('title_en'), n.get('title_zh'))}</h3><span class="go">{t('Read more →','查看详情 →')}</span></div></a>'''
+    return f'''<article class="post" id="post-{idx}">{f'<div class="{cls}">{gal}</div>' if gal else ''}<div class="post-txt">{news_date(n.get('date', ''))}<h3>{bi(n.get('title_en'), n.get('title_zh'))}</h3>{text}</div></article>'''
+
+def news_home():
+    if not NEWS:
+        return ''
+    posts = ''.join(news_post(n, i, short=True) for i, n in enumerate(NEWS[:3]))
+    return f'''<section class="s"><div class="wrap">
+  <div class="head"><div class="kicker">{t('News','新闻动态')}</div><h2>{t('Updated news &amp; content','最新动态')}</h2></div>
+  <div class="news-grid">{posts}</div>
+  <p style="margin-top:22px"><a class="btn btn-line" href="news.html">{t('All news →','全部动态 →')}</a></p>
+</div></section>
+'''
+
+def page_news():
+    posts = ''.join(news_post(n, i) for i, n in enumerate(NEWS)) or f'<p class="empty">{t("News is coming soon.","新闻动态即将更新。")}</p>'
+    return head('News', 'news', 'Senrex news: new products, factory updates, photos and videos.') + f'''
+<div class="ptitle"><div class="wrap"><h1>{t('Updated News &amp; Content','最新动态')}</h1><p>{t('New products, factory updates, photos and short videos from Senrex.','赛恩力新品发布、工厂动态、图片与短视频。')}</p></div></div>
+<section class="s"><div class="wrap"><div class="news-list">{posts}</div></div></section>
+''' + foot()
+
 def page_home():
     cats = ''.join(f'''<a class="cat cat-{k}" href="products.html#{k}"><div class="pic"><img src="{thumb(img(im), 640)}" alt="{e(en)}" loading="lazy"></div>
 <div class="txt"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p><span class="n">{COUNTS[k]} {t('models','个型号')} →</span></div></a>''' for k, en, zh, den, dzh, im in CATS)
@@ -286,7 +350,7 @@ def page_home():
   </div>
   {CERTGRID_HTML}
 </div></section>
-''' + ceo_section() + f'''<section class="s alt" id="inquiry"><div class="wrap contact single">
+''' + news_home() + ceo_section() + f'''<section class="s alt" id="inquiry"><div class="wrap contact single">
   <div class="cbox">
     {inquiry_form('inq-home')}
   </div>
@@ -424,6 +488,7 @@ write('index.html', page_home())
 write('products.html', page_products())
 write('about.html', page_about())
 write('contact.html', page_contact())
+write('news.html', page_news())
 open(os.path.join(ROOT, 'assets', 'js', 'data.js'), 'w', encoding='utf-8').write(
     'window.SENREX_DATA=' + json.dumps({'power': D['power'], 'battery': D['battery'], 'solar': D['solar'],
     'series': {k: [v[0], v[1]] for k, v in SERIES.items()}}, ensure_ascii=False) + ';\nwindow.SENREX_COUNTRIES='

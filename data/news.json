@@ -1,0 +1,22 @@
+{
+ "posts": [
+  {
+   "id": "n1",
+   "date": "2026-11-26",
+   "title_en": "New: portable folding solar panels",
+   "title_zh": "新品上市：便携式折叠太阳能板",
+   "body_en": "Two new waterproof, splash-resistant folding solar panels are now available: a multi-fold panel with a stand, higher power options and custom LOGO printing, and a compact double-fold panel with a full set of adapters.\nGreat for camping, vehicles, RVs, the wild and power outages. Contact us on WhatsApp for prices.",
+   "body_zh": "两款防水防泼溅折叠太阳能板全新上市：多折款带支架，功率可选更大，可印LOGO；双折款小巧轻便，配件齐全，带多种转接头。\n适用于露营、车载、房车、野外及停电应急。欢迎通过 WhatsApp 咨询价格。",
+   "media": [
+    {
+     "type": "image",
+     "src": "assets/img/solar/spv-multifold.jpg"
+    },
+    {
+     "type": "image",
+     "src": "assets/img/solar/spv-bifold.jpg"
+    }
+   ]
+  }
+ ]
+}

@@ -6,7 +6,7 @@
   var OWNER = 'junaed9156', REPO = 'Senrex', BRANCH = 'main';
   var API = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
   var token = null;
-  var state = { products: null, productsSha: null, site: null, siteSha: null, catalog: [], defaults: { company: {}, images: [] }, dirty: false };
+  var state = { products: null, productsSha: null, site: null, siteSha: null, news: null, newsSha: null, catalog: [], defaults: { company: {}, images: [] }, dirty: false };
   var $ = function (s, r) { return (r || document).querySelector(s); };
   function el(tag, attrs, html) { var e = document.createElement(tag); if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -76,7 +76,7 @@
   function showSetup(on) {
     $('#setupForm').classList.toggle('hide', !on);
     $('#loginForm').classList.toggle('hide', on);
-    $('#loginSub').innerHTML = on ? 'First-time setup<br>首次设置' : 'Log in to edit products, photos and texts<br>登录以编辑产品、图片和文字';
+    $('#loginSub').innerHTML = on ? 'First-time setup<br>首次设置' : 'Log in to edit products, news, photos and texts<br>登录以编辑产品、新闻、图片和文字';
   }
   $('#resetLink').addEventListener('click', function (e) { e.preventDefault(); showSetup(true); });
   $('#loginForm').addEventListener('submit', async function (e) {
@@ -123,6 +123,8 @@
       var s = await getJSON('data/site.json', true);
       state.site = s ? s.data : {}; state.siteSha = s ? s.sha : null;
       state.site.company = state.site.company || {}; state.site.texts = state.site.texts || {}; state.site.images = state.site.images || {};
+      var n = await getJSON('data/news.json', true);
+      state.news = n ? n.data : { posts: [] }; state.newsSha = n ? n.sha : null; state.news.posts = state.news.posts || [];
       state.catalog = (await publicJSON('data/texts_catalog.json')) || [];
       state.defaults = (await publicJSON('data/site_defaults.json')) || { company: {}, images: [] };
       status('Ready · 就绪'); render('power');
@@ -161,6 +163,31 @@
     pendingPreview[path] = c.url;
     status('Photo uploaded · 图片已上传 — remember to Save · 请点击保存');
     return path;
+  }
+  var MAX_VIDEO_MB = 20;
+  function readDataURL(file) {
+    return new Promise(function (resolve, reject) { var rd = new FileReader(); rd.onload = function () { resolve(rd.result); }; rd.onerror = reject; rd.readAsDataURL(file); });
+  }
+  async function uploadVideo(file) {
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) throw new Error('Video is larger than ' + MAX_VIDEO_MB + ' MB. Please upload a shorter or smaller video. 视频超过 ' + MAX_VIDEO_MB + 'MB，请上传更短或更小的视频。');
+    var ext = (file.name.match(/\.([a-z0-9]+)$/i) || [, 'mp4'])[1].toLowerCase();
+    if (['mp4', 'webm', 'mov', 'm4v'].indexOf(ext) < 0) ext = 'mp4';
+    status('Uploading video… 上传视频中…（' + (file.size / 1048576).toFixed(1) + ' MB）');
+    var url = await readDataURL(file);
+    var slug = (file.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'video').slice(0, 40);
+    var path = 'assets/video/uploads/' + Date.now() + '-' + slug + '.' + ext;
+    await putFile(path, url.split(',')[1], 'Admin: upload ' + path);
+    pendingPreview[path] = URL.createObjectURL(file);
+    status('Video uploaded · 视频已上传 — remember to Save · 请点击保存');
+    return path;
+  }
+  function pickVideo(cb) {
+    var inp = el('input', { type: 'file', accept: 'video/mp4,video/webm,video/quicktime,video/*' });
+    inp.addEventListener('change', async function () {
+      if (!inp.files[0]) return;
+      try { cb(await uploadVideo(inp.files[0])); markDirty(); } catch (err) { status('Upload failed: ' + err.message); }
+    });
+    inp.click();
   }
   function pickImage(cb) {
     var inp = el('input', { type: 'file', accept: 'image/*' });
@@ -361,6 +388,79 @@
     ib.appendChild(grid); main.appendChild(ib);
   }
 
+  function renderNews() {
+    var main = $('#main'); main.innerHTML = '';
+    var posts = state.news.posts;
+    var bar = el('div', { class: 'bar' });
+    var add = el('button', { class: 'btn green' }, '+ New post · 发布新动态');
+    bar.appendChild(add);
+    bar.appendChild(el('span', { class: 'help' }, posts.length + ' posts · 条。Add photos and short videos (MP4, up to ' + MAX_VIDEO_MB + ' MB), then press Save all. 可上传图片和短视频（MP4，最大' + MAX_VIDEO_MB + 'MB），完成后点击“全部保存”。'));
+    main.appendChild(bar);
+    var listBox = el('div'); main.appendChild(listBox);
+    function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function draw(openIndex) {
+      listBox.innerHTML = '';
+      posts.forEach(function (post, idx) {
+        post.media = post.media || [];
+        var d = el('details', { class: 'item' }); if (idx === openIndex) d.open = true;
+        var sum = el('summary');
+        var paint = function () {
+          var first = post.media.filter(function (m) { return m.type !== 'video'; })[0];
+          var th = first ? '<img src="' + esc(shown(first.src)) + '" alt="">' : '<img alt="" src="assets/img/logo_mark.png">';
+          sum.innerHTML = th + '<div><div class="t">' + esc(post.title_en || post.title_zh || '(no title · 无标题)') + (post.hidden ? ' <span class="badge" style="background:#fdecea;color:#c0392b">hidden · 已隐藏</span>' : '') + '</div><div class="s">' + esc(post.date || '') + ' · ' + post.media.length + ' photos/videos · 图片/视频</div></div>';
+        };
+        paint(); d.appendChild(sum);
+        d.addEventListener('toggle', function () {
+          if (!d.open || d.dataset.built) return; d.dataset.built = '1';
+          var fs = el('div', { class: 'fields' });
+          function txt(key, label, area, type) {
+            var w = el('div', area ? { class: 'wide' } : null); w.appendChild(el('label', null, esc(label)));
+            var i = area ? el('textarea', { rows: '5' }) : el('input', { type: type || 'text' }); i.value = post[key] || '';
+            i.addEventListener('input', function () { post[key] = i.value; markDirty(); paint(); }); w.appendChild(i); return w;
+          }
+          fs.appendChild(txt('date', 'Date · 日期', false, 'date'));
+          fs.appendChild(txt('title_en', 'Title (English) · 英文标题'));
+          fs.appendChild(txt('title_zh', 'Title (中文) · 中文标题'));
+          fs.appendChild(txt('body_en', 'Text (English) · 英文内容', true));
+          fs.appendChild(txt('body_zh', 'Text (中文) · 中文内容', true));
+          var mw = el('div', { class: 'wide' }); mw.appendChild(el('label', null, 'Photos &amp; videos · 图片和视频'));
+          var box = el('div', { class: 'imgs' }); mw.appendChild(box);
+          var drawMedia = function () {
+            box.innerHTML = '';
+            post.media.forEach(function (m, i) {
+              var fig = el('figure', null, m.type === 'video'
+                ? '<video src="' + esc(shown(m.src)) + '" muted playsinline preload="metadata" style="width:110px;height:110px;object-fit:cover;background:#000;border-radius:10px;display:block;margin-bottom:4px"></video>🎬 video'
+                : '<img src="' + esc(shown(m.src)) + '" alt="">');
+              var ctr = el('div');
+              var lf = el('span', { class: 'x', style: 'color:var(--navy);margin-right:8px' }, '←');
+              lf.onclick = function () { if (i > 0) { post.media.splice(i - 1, 0, post.media.splice(i, 1)[0]); markDirty(); drawMedia(); paint(); } };
+              var rm = el('span', { class: 'x' }, '✕ remove · 删除');
+              rm.onclick = function () { post.media.splice(i, 1); markDirty(); drawMedia(); paint(); };
+              ctr.appendChild(lf); ctr.appendChild(rm); fig.appendChild(ctr); box.appendChild(fig);
+            });
+            var ap = el('button', { type: 'button', class: 'btn light sm' }, '+ Add photo · 添加图片');
+            ap.onclick = function () { pickImage(function (path) { post.media.push({ type: 'image', src: path }); drawMedia(); paint(); }); };
+            var av = el('button', { type: 'button', class: 'btn light sm' }, '+ Add video · 添加视频');
+            av.onclick = function () { pickVideo(function (path) { post.media.push({ type: 'video', src: path }); drawMedia(); paint(); }); };
+            box.appendChild(ap); box.appendChild(av);
+          };
+          drawMedia(); fs.appendChild(mw);
+          var act = el('div', { class: 'actions' });
+          var hide = el('button', { class: 'btn light sm', type: 'button' }, post.hidden ? '👁 Show on site · 显示' : '🙈 Hide from site · 隐藏');
+          hide.onclick = function () { post.hidden = !post.hidden; if (!post.hidden) delete post.hidden; markDirty(); draw(idx); };
+          var del = el('button', { class: 'btn red sm', type: 'button' }, '🗑 Delete post · 删除');
+          del.onclick = function () { if (del.dataset.sure) { posts.splice(idx, 1); markDirty(); draw(); } else { del.dataset.sure = '1'; del.textContent = 'Click again to delete · 再次点击确认删除'; } };
+          act.appendChild(hide); act.appendChild(del);
+          fs.appendChild(act); d.appendChild(fs);
+        });
+        listBox.appendChild(d);
+      });
+      if (!posts.length) listBox.appendChild(el('p', { class: 'help' }, 'No posts yet · 暂无动态'));
+    }
+    add.addEventListener('click', function () { posts.unshift({ id: 'n' + Date.now(), date: today(), title_en: '', title_zh: '', body_en: '', body_zh: '', media: [] }); markDirty(); draw(0); });
+    draw();
+  }
+
   function renderSettings() {
     var main = $('#main'); main.innerHTML = '';
     var box = el('div', { class: 'box' }, '<h3>Change username &amp; password · 修改用户名和密码</h3>' +
@@ -385,7 +485,7 @@
 
   function render(tab) {
     document.querySelectorAll('#tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === tab); });
-    if (SCHEMA[tab]) renderList(tab); else if (tab === 'texts') renderTexts(); else if (tab === 'company') renderCompany(); else renderSettings();
+    if (SCHEMA[tab]) renderList(tab); else if (tab === 'news') renderNews(); else if (tab === 'texts') renderTexts(); else if (tab === 'company') renderCompany(); else renderSettings();
     window.scrollTo(0, 0);
   }
   document.querySelectorAll('#tabs button').forEach(function (b) { b.addEventListener('click', function () { render(b.dataset.tab); }); });
@@ -399,6 +499,8 @@
       state.productsSha = r1.content.sha;
       var r2 = await putFile('data/site.json', utf8b64(JSON.stringify(state.site, null, 1)), 'Admin: update site texts and photos', state.siteSha);
       state.siteSha = r2.content.sha;
+      var r3 = await putFile('data/news.json', utf8b64(JSON.stringify(state.news, null, 1)), 'Admin: update news', state.newsSha);
+      state.newsSha = r3.content.sha;
       state.dirty = false;
       status('Saved ✓ The website updates in about 2 minutes · 已保存，约2分钟后网站更新');
     } catch (err) {

@@ -60,6 +60,11 @@
 "zh": "产品中心"
 },
 {
+"key": "News",
+"en": "News",
+"zh": "新闻动态"
+},
+{
 "key": "About Us",
 "en": "About Us",
 "zh": "关于我们"
@@ -188,6 +193,21 @@
 "key": "Learn more",
 "en": "Learn more",
 "zh": "了解更多"
+},
+{
+"key": "Read more →",
+"en": "Read more →",
+"zh": "查看详情 →"
+},
+{
+"key": "Updated news &amp; content",
+"en": "Updated news &amp; content",
+"zh": "最新动态"
+},
+{
+"key": "All news →",
+"en": "All news →",
+"zh": "全部动态 →"
 },
 {
 "key": "CEO · Energy Storage Power Supply",
@@ -703,5 +723,15 @@
 "key": "Chat on WhatsApp",
 "en": "Chat on WhatsApp",
 "zh": "WhatsApp 咨询"
+},
+{
+"key": "Updated News &amp; Content",
+"en": "Updated News &amp; Content",
+"zh": "最新动态"
+},
+{
+"key": "New products, factory updates, photos and short videos from Senrex.",
+"en": "New products, factory updates, photos and short videos from Senrex.",
+"zh": "赛恩力新品发布、工厂动态、图片与短视频。"
 }
 ]
