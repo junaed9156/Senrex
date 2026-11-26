@@ -64,7 +64,7 @@ MAIL_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0
 CATS = [
     ('power', 'Portable Power Stations', '便携式储能电源', 'Outdoor & home backup power, 150W to 11,000W, NMC and LiFePO4.', '户外及家庭备用电源，150W–11000W，三元锂 / 磷酸铁锂。', 'assets/img/showcase/power.webp'),
     ('battery', 'Lithium Battery Packs', '动力锂电池组', '48V / 60V / 72V packs from 12Ah to 230Ah, NMC and LiFePO4.', '48V / 60V / 72V，12Ah–230Ah，三元锂 / 磷酸铁锂。', 'assets/img/showcase/battery.webp'),
-    ('solar', 'Solar Storage & Inverters', '光储一体机与逆变器', 'GSL-LinkI all-in-one systems, GBP-Pro I batteries, GST hybrid inverters.', 'GSL-LinkI 光储一体机、GBP-Pro I 低压电池、GST 逆变器。', 'assets/img/showcase/solar.webp'),
+    ('solar', 'Solar Storage & Inverters', '光储一体机与逆变器', 'GSL-LinkI all-in-one systems, GBP-Pro I batteries, GST hybrid inverters and portable folding solar panels.', 'GSL-LinkI 光储一体机、GBP-Pro I 低压电池、GST 逆变器及便携式折叠太阳能板。', 'assets/img/showcase/solar.webp'),
     ('remote', 'Remote Controls', '遥控器', 'Replacement AC and TV remotes for all major brands.', '各大品牌空调与电视替换遥控器。', 'assets/img/showcase/remote.webp'),
 ]
 COUNTS = {'power': len(D['power']), 'battery': len(D['battery']), 'solar': len(D['solar']),
@@ -274,6 +274,7 @@ SERIES = {
     'gsl': ('GSL-LinkI Series All-in-One', 'GSL-LinkI 系列光储锂电一体机', 'Integrates PV, storage, inverter and power distribution in one cabinet. 3.5kW to 50kW, 5kWh to 112kWh, for homes, shops and factories.', '集光伏、储能、逆变、配电于一体，3.5kW–50kW，5kWh–112kWh，适用户用及工商业。'),
     'gbp': ('GBP-Pro I Series Low-Voltage Battery', 'GBP-Pro I 系列低压锂电屏幕版', 'Wall or floor battery with display, ≥6000 cycles, CAN/RS485, up to 20 units in parallel.', '带显示屏，循环寿命≥6000次，CAN/RS485通信，最多20台并联。'),
     'gst': ('GST Series Single-Phase Hybrid Inverter', 'GST 系列单相光储逆变器', 'All-in-one solar charge inverter, pure sine wave, four charging modes, app monitoring, 3.5kW to 12.5kW.', '一体式太阳能充电逆变器，纯正弦波，四种充电模式，APP监控，3.5kW–12.5kW。'),
+    'spv': ('Portable Folding Solar Panels', '便携式折叠太阳能板', 'Waterproof and splash-resistant folding panels for camping, vehicles, RVs, the wild and power outages. Pair them with our portable power stations.', '防水防泼溅折叠太阳能板，露营、车载、房车、野外及停电应急均可使用，可搭配便携式储能电源。'),
 }
 
 def page_products():
@@ -305,11 +306,16 @@ def page_products():
         for i, x in enumerate(D['solar']):
             if x['series'] != key: continue
             sub = (e(x['cap']) if key == 'gbp' else f"{e(x['rated'])} W")
+            chip2 = f'<span class="chip">{e(x["bv"])}</span>'
+            if key == 'spv':
+                sub = t(x.get('fold_en', ''), x.get('fold_zh') or x.get('fold_en', ''))
+                chip2 = f'<span class="chip">{t("Waterproof", "防水防泼溅")}</span>'
             simg = pimg('solar', x['img']) if x.get('img') else img(f'assets/img/solar/{key}.jpg')
             x['_img'] = simg
             cards += f'''<div class="card" data-kind="solar" data-id="{i}"><div class="pic"><img src="{simg}" alt="{e(en)} {e(x['model'])}" loading="lazy"></div>
 <div class="body"><span class="code">{key.upper()}</span><h3>{t(x['name_en'], x.get('name_zh') or x['name_en']) if x.get('name_en') else e(x['model'])}</h3><div class="meta">{t(en, zh)}</div>
-<div class="chips"><span class="chip">{sub}</span><span class="chip">{e(x['bv'])}</span></div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
+<div class="chips"><span class="chip">{sub}</span>{chip2}</div><span class="go">{t('View specs →','查看参数 →')}</span></div></div>'''
+        if not cards: continue
         sol += f'''<div class="series-head" id="{key}"><h3>{t(en, zh)}</h3><p>{t(den, dzh)}</p></div><div class="grid">{cards}</div>'''
     rem = ''
     for r in D['remote']:
@@ -323,7 +329,7 @@ def page_products():
 <div class="wrap">
   <div class="group" id="power"><h2>{t('Portable Power Stations','便携式储能电源')}</h2><p class="sub">{t('150W to 11,000W · NMC and LiFePO4 · AC, USB, Type-C and solar input','150W–11000W · 三元锂 / 磷酸铁锂 · AC、USB、Type-C 输出，支持太阳能充电')}</p><div class="grid">{pcards}</div></div>
   <div class="group" id="battery"><h2>{t('Lithium Battery Packs','动力锂电池组')}</h2><p class="sub">{t('48V, 60V and 72V · 12Ah to 230Ah · each model available in NMC (ternary) and LiFePO4','48V / 60V / 72V · 12Ah–230Ah · 每款均有三元锂与磷酸铁锂两种')}</p><div class="grid">{bcards}</div></div>
-  <div class="group" id="solar"><h2>{t('Solar Storage & Inverters','光储一体机与逆变器')}</h2><p class="sub">{t('Complete solar energy storage for homes and businesses','户用及工商业光伏储能整体方案')}</p>{sol}</div>
+  <div class="group" id="solar"><h2>{t('Solar Storage & Inverters','光储一体机与逆变器')}</h2><p class="sub">{t('Complete solar energy storage for homes and businesses, plus portable folding solar panels','户用及工商业光伏储能整体方案，以及便携式折叠太阳能板')}</p>{sol}</div>
   <div class="group" id="remote"><h2>{t('Remote Controls','遥控器')}</h2><p class="sub">{t('Replacement AC and TV remotes · tap a model number to ask on WhatsApp','空调与电视替换遥控器 · 点击型号即可通过 WhatsApp 询价')}</p><div class="remotes">{rem}</div></div>
 </div>
 ''' + foot()

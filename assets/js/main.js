@@ -107,6 +107,12 @@
       name = (p.name_en || sn[0] + ' ' + p.model);
       title = (p.name_en ? nm(p, '', '') : esc(p.model)) + ' <small style="display:block;font-size:15px;color:var(--muted);font-weight:600">' + L(sn[0], sn[1]) + '</small>';
       p = Object.assign({}, p, { id: p.series.toUpperCase() + ' ' + p.model });
+      if (p.series === 'spv') {
+        rows = '<tr><th>' + L('Design', '款式') + '</th><td>' + L(esc(p.fold_en || ''), esc(p.fold_zh || p.fold_en || '')) + '</td></tr>' +
+          '<tr><th>' + L('Features', '产品特点') + '</th><td>' + L(esc(p.feat_en || p.specs), esc(p.feat_zh || p.feat_en || p.specs)) + '</td></tr>' +
+          '<tr><th>' + L('Best for', '适用场景') + '</th><td>' + L(esc(p.use_en || ''), esc(p.use_zh || p.use_en || '')) + '</td></tr>' +
+          (p.size !== '—' && p.size ? row('Size (mm)', '尺寸 (mm)', p.size) : '') + (p.weight !== '—' && p.weight ? row('Weight (kg)', '重量 (kg)', p.weight) : '');
+      } else
       rows = (p.rated !== '—' ? row('Rated power (W)', '额定功率 (W)', p.rated) + row('Peak power (W)', '峰值功率 (W)', p.peak) : '') +
         row('Battery voltage', '电池电压', p.bv) + (p.cap !== '—' ? row('Battery capacity', '电池容量', p.cap) : '') +
         row('Key specs', '主要参数', p.specs) + row('Size (mm)', '尺寸 (mm)', p.size) + row('Weight (kg)', '重量 (kg)', p.weight);
