@@ -200,7 +200,8 @@ section.s + section.s { border-top: 1px solid #75928d36; }
 .cat .n,.card .go,.card .code { color: var(--brass); }
 .cat .pic { border-bottom-width: 2px; }
 .cat-battery .pic { background: linear-gradient(130deg,#bbd4cb,#e4e8d9); }
-.cat-remote .pic { background: linear-gradient(130deg,#d1c4d0,#e6ded8); }
+.cat-remote .pic { background: #fff; }
+.cat-remote .pic img { mix-blend-mode: normal; padding: 6px; }
 .why div:nth-child(even) { background: linear-gradient(140deg,#28484a,#142f39); }
 .why i, .why div:nth-child(2n) i { background: #33535a; color: #f4cc93; border: 1px solid #6a817b; box-shadow: none; }
 .ptitle,.ctaband {
